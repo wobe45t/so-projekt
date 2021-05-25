@@ -10,6 +10,7 @@
 #include "Nature.h"
 #include "Resources.h"
 #include "Sawmill.h"
+#include "SawmillManager.h"
 #include "Transport.h"
 #include <vector>
 #include <sstream>
@@ -35,6 +36,7 @@ private:
     Nature * nature;
     Manager * manager;
     Sawmill * sawmill;
+    SawmillManager * sawmillManager;
     Resources * resources;
     Transport * transport;
     int counter = {0};

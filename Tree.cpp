@@ -3,7 +3,7 @@
 #include <iostream>
 #include <random>
 #include <unistd.h>
-Tree::Tree(int id, Nature * nature) : id(id), nature(nature), td(&Tree::cycle, this)
+Tree::Tree(int id, Nature * nature, Resources * resources) : id(id), nature(nature), resources(resources), td(&Tree::cycle, this)
 {}
 
 void Tree::addLumberjack() {
@@ -22,7 +22,7 @@ void Tree::cycle() {
       if(newValue >= 100.0f) {
         state = TreeState::LIVING;
       } 
-      usleep(250000 + rand() % 100000);
+      usleep(100000 + rand() % 100000);
     }
     // usleep(500000);
   }
@@ -37,6 +37,7 @@ bool Tree::cut() {
     cutProgress = 0;
     growth = 0;
     cutSize = 1.0f;
+    resources->addWood(8);
     state = TreeState::GROWING;
     return false;
   }

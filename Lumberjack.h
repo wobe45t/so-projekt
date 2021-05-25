@@ -6,13 +6,12 @@
 #include <vector>
 #include "Tree.h"
 #include "LumberjackState.h"
-#include "Resources.h"
 using namespace std;
 class Lumberjack
 {
 public:
   static const int NumberOfLumberjacks = 10;
-  Lumberjack(int id, vector<Tree *> trees, Resources * resources);
+  Lumberjack(int id, vector<Tree *> trees);
   bool getRunning();
   void setRunning(bool running);
   int getId();
@@ -26,7 +25,6 @@ private:
   bool running = true; 
   std::atomic<LumberjackState> state {LumberjackState::WAITING};
   vector<Tree*> trees;
-  Resources * resources;
 
   void cycle();
   Tree* findTree();

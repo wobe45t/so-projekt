@@ -6,11 +6,12 @@
 #include <thread>
 #include "TreeState.h"
 #include "Nature.h"
+#include "Resources.h"
 using namespace std;
 class Tree {
 
 public:
-  Tree(int id, Nature * nature);
+  Tree(int id, Nature * nature, Resources * resources);
   int getId();
   float getGrowth();
   float getCutProgress();
@@ -35,6 +36,7 @@ private:
   std::thread td;
   bool running = true;
   Nature * nature;
+  Resources * resources;
   int id;
   std::atomic<float> growth {100.0f};
   std::atomic<float> cutProgress {0.0f};

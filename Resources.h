@@ -7,13 +7,15 @@
 class Resources {
 public:
   Resources();
-  int requestWood(int wood);
+  void requestWood(int wood);
   void addWood(int wood);
   int requestLongBoard(int boards);
   int requestNormalBoard(int boards);
   int requestShortBoard(int boards);
+  void requestBoards(int shortBoards, int normalBoards, int longBoards);
   int requestBoard(int boards, BoardType boardType);
   void addBoard(int boards, BoardType boardType);
+  void addNormalBoard();
   int getWood();
   int getLongBoards();
   int getShortBoards();

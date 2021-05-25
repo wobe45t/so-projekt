@@ -4,6 +4,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <condition_variable>
 #include "Resources.h"
 #include "SawmillState.h"
 #include "BoardType.h"
@@ -12,15 +13,23 @@ public:
   Sawmill(Resources * resources);
   Sawmill(Resources * resources, BoardType boardType);
   void cycle();
-  std::string getBoardType();
+  std::string getBoardTypeStr();
+  std::string getWorkRequestStr();
+  BoardType getBoardType();
   void setRunning(bool running);
-  int startWork();
-  BoardType boardType;
-  SawmillState state;
-  std::string getState();
+  std::string getStateStr();
+  float getProgress();
+  int wait_counter = 0;
+  bool requestBoard();
+  SawmillState getState();
 private:
+  BoardType boardType;
+  std::atomic<SawmillState> state {SawmillState::WAITING};
+  std::atomic<bool> workRequested {false};
+  float progress = 0.0f;
   Resources * resources;
   bool running = true;
+  std::condition_variable cv;
   std::mutex mtx;
   std::thread td;
 };

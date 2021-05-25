@@ -1,11 +1,9 @@
 #include "Transport.h"
 #include <unistd.h>
 
-#define LONG 20
-#define NORMAL 15
-#define SHORT 18
+#define RAND_RANGE 10
 
-Transport::Transport(SawmillManager * sawmillManager) : sawmillManager(sawmillManager), td(&Transport::cycle, this)
+Transport::Transport(Resources * resources) : resources(resources), td(&Transport::cycle, this)
 {
 
 }
@@ -13,18 +11,40 @@ Transport::Transport(SawmillManager * sawmillManager) : sawmillManager(sawmillMa
 void Transport::cycle() {
   while(running) {
     if(transportState == TransportState::WAITING) {
-      sawmillManager->getResources(SHORT, NORMAL, LONG);
+      if(orderReady == false) {
+        generateOrder();
+        orderReady = true;
+        cv.notify_one();    // powiadomienie SawmillManager o gotowym zamowieniu
+      }
+      resources->requestBoards(shortBoards, normalBoards, longBoards);
+      transportCounter++;
       transportState = TransportState::TO_SHOP;
+      orderReady=false;
     }
     if(transportState == TransportState::TO_SHOP) {
-      usleep(40000000); //20sek
+      while(progress <= 100.0f) {
+        progress+=1;
+        usleep(200000); //20sek
+      }
       transportState = TransportState::FROM_SHOP;
     }
+    progress=0.0f;
     if(transportState == TransportState::FROM_SHOP){
-      usleep(40000000); //20sek
+      while(progress <= 100.0f) {
+        progress+=1;
+        usleep(200000); //20sek
+      }
       transportState = TransportState::WAITING;
     }
+    progress=0.0f;
   }
+}
+
+std::vector<int> Transport::getOrder() {
+  std::unique_lock<std::mutex> ul(mtx);
+  cv.wait(ul, [&] {return orderReady ? true : false;});
+  std::vector<int> order = {shortBoards, normalBoards, longBoards};
+  return order;
 }
 
 std::string Transport::getState() {
@@ -38,4 +58,19 @@ std::string Transport::getState() {
     default:
     return "UNKNOWN";
   }
+}
+
+void Transport::generateOrder() {
+  longBoards = rand() % RAND_RANGE + 1;
+  normalBoards = rand() % RAND_RANGE + 1;
+  shortBoards = rand() % RAND_RANGE + 1;
+  orderReady = true;
+}
+
+int Transport::getTransportCounter() {
+  return transportCounter;
+}
+
+float Transport::getProgress() {
+  return progress;
 }

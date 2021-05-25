@@ -57,5 +57,6 @@
     "streambuf": "cpp",
     "typeinfo": "cpp",
     "iomanip": "cpp"
-  }
+  },
+  "python.pythonPath": "/bin/python"
 }

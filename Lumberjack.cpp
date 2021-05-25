@@ -9,7 +9,7 @@
 #include <random>
 
 using namespace std;
-Lumberjack::Lumberjack(int id, vector<Tree *> trees, Resources *resources) : id(id), trees(trees), resources(resources), td(&Lumberjack::cycle, this)
+Lumberjack::Lumberjack(int id, vector<Tree *> trees) : id(id), trees(trees), td(&Lumberjack::cycle, this)
 {
 }
 
@@ -52,7 +52,7 @@ void Lumberjack::cycle()
         usleep(sleepTime);
       }
       treeId = 0;
-      resources->addWood(1);
+      
     }
     state = LumberjackState::RESTING;
     usleep(1000000);
@@ -61,7 +61,6 @@ void Lumberjack::cycle()
 
 void Lumberjack::setRunning(bool running)
 {
-  std::lock_guard<std::mutex> lock(mtx);
   this->running = running;
 }
 
@@ -69,13 +68,11 @@ bool Lumberjack::getRunning() { return running; }
 
 int Lumberjack::getId()
 {
-  std::lock_guard<std::mutex> lock(mtx);
   return id;
 }
 
 int Lumberjack::getTreeId()
 {
-  std::lock_guard<std::mutex> lock(mtx);
   return treeId;
 }
 

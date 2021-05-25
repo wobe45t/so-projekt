@@ -1,6 +1,8 @@
 #include "SawmillManager.h"
-
-SawmillManager::SawmillManager(Resources *resources, std::vector<Sawmill *> sawmills) : resources(resources), sawmills(sawmills), td(&SawmillManager::cycle, this)
+#include "BoardType.h"
+#include "SawmillState.h"
+SawmillManager::SawmillManager(Resources *resources, std::vector<Sawmill *> sawmills, Transport *transport) : resources(resources),
+ sawmills(sawmills), transport(transport), td(&SawmillManager::cycle, this)
 {
 }
 
@@ -8,52 +10,45 @@ void SawmillManager::cycle()
 {
   while (running)
   {
-
-    
+    message = "Waiting for order";
+    std::vector<int> orderedBoards = transport->getOrder();
+    while(resources->getShortBoards() <= orderedBoards[0] || resources->getNormalBoards() <= orderedBoards[1] || resources->getLongBoards() <= orderedBoards[2]){
+      if(orderedBoards[2] >= orderedBoards[1]) {
+        if(sawmills[2]->getState() == SawmillState::WAITING && orderedBoards[2]>0) {
+          sawmills[2]->requestBoard();
+        } else if(sawmills[1]->getState() == SawmillState::WAITING && orderedBoards[1] > 0) {
+          sawmills[1]->requestBoard();
+        } else if (sawmills[0]->getState()== SawmillState::WAITING && orderedBoards[0] > 0) {
+          sawmills[0]->requestBoard();
+        }
+      } else if (orderedBoards[1] >= orderedBoards[0]){ // no need for long boards atm
+        if(sawmills[1]->getState() == SawmillState::WAITING && orderedBoards[1]>0) {
+          sawmills[1]->requestBoard();
+        } else if(sawmills[0]->getState() == SawmillState::WAITING && orderedBoards[0] > 0) {
+          sawmills[0]->requestBoard();
+        } else if (sawmills[2]->getState() == SawmillState::WAITING && orderedBoards[2] > 0) {
+          sawmills[2]->requestBoard();
+        }
+      } else { // no need for long or normal atm
+        if(sawmills[0]->getState() == SawmillState::WAITING && orderedBoards[9]>0) {
+          sawmills[0]->requestBoard();
+        } else if(sawmills[1]->getState() == SawmillState::WAITING && orderedBoards[1] > 0) {
+          sawmills[1]->requestBoard();
+        } else if (sawmills[2]->getState() == SawmillState::WAITING && orderedBoards[2] > 0) {
+          sawmills[2]->requestBoard();
+        }
+      }
+      message = "Boards left: " + std::to_string(orderedBoards[0] - resources->getShortBoards()) + " " + std::to_string(orderedBoards[1] - resources->getNormalBoards()) + " " + std::to_string(orderedBoards[2] - resources->getLongBoards());
+    }
   }
 }
-void SawmillManager::getResources(int shortBoard, int normalBoard, int longBoard) {
-  this->shortBoard = shortBoard;
-  this->normalBoard = normalBoard;
-  this->longBoard = longBoard;
 
-  getBoards();
-
-  std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return (transportPrepared) ? true : false;});
-
-  transportPrepared = false;
-
-}
-
-bool SawmillManager::getBoards()
-{
-  int sum = 0;
-  do {
-    sum = longBoard + shortBoard + normalBoard;
-    int r = rand() % sum;
-    if(r<shortBoard) {
-      shortBoard -= 1;
-      getSawmill(BoardType::SHORT)->startWork();
-    }
-    else if (r>=shortBoard && r < shortBoard + normalBoard) {
-      normalBoard -= 1;
-      getSawmill(BoardType::NORMAL)->startWork();
-    } else {
-      longBoard -= 1;
-      getSawmill(BoardType::LONG)->startWork();
-    }
-  } while(sum > 0);
-  transportPrepared = true;
-  cv.notify_one();
-}
-
-Sawmill * SawmillManager::getSawmill(BoardType boardType) {
-  for(int i=0; i<sawmills.size(); i++) {
-    if(sawmills[i]->boardType == boardType) return sawmills[i];
-  }
-  return NULL;
-}
+// Sawmill * SawmillManager::getSawmill(BoardType boardType) {
+//   for(int i=0; i<sawmills.size(); i++) {
+//     if(sawmills[i]->boardType == boardType) return sawmills[i];
+//   }
+//   return NULL;
+// }
 
 std::string SawmillManager::getMessage() {
   return message;
@@ -72,4 +67,8 @@ int SawmillManager::getShortBoards()
 int SawmillManager::getNormalBoards()
 {
   return normalBoard;
+}
+
+Transport * SawmillManager::getTransport() {
+  return transport;
 }

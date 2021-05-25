@@ -25,6 +25,7 @@ public:
   Nature* getNature();
   Resources* getResources();
   Sawmill* getSawmill();
+  SawmillManager * getSawmillManager();
   Transport * getTransport();
   std::vector<Sawmill*> getSawmills();
 private:
@@ -34,8 +35,7 @@ private:
   Nature * nature;
   Resources * resources;
   Sawmill * sawmill;
-  SawmillManager * sawmillManager;
   Transport * transport;
-
+  SawmillManager * sawmillManager;
   bool running = true;
 };
