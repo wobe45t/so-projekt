@@ -4,10 +4,16 @@ Nature::Nature() : td(&Nature::cycle, this)
 {}
 
 void Nature::cycle() {
+  int random_value;
   while(running) {
-    usleep(10000000 + rand() % 5000000);
+    random_value = rand() % 50000;
+    while(changeProgress < 100) {
+      usleep(100000 + random_value);
+      changeProgress += 1;
+    }
     int randCondition = rand() % 3;
     condition = (NatureCondition)randCondition;
+    changeProgress = 0;
   }
 }
 
@@ -23,7 +29,9 @@ std::string Nature::getConditions() {
     return "UNKNOWN";
   }
 }
-
+int Nature::getChangeProgress() {
+  return changeProgress;
+}
 float Nature::getGrowthCoef() {
   switch(condition) {
     case NatureCondition::BAD:

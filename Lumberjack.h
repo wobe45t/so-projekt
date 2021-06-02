@@ -16,12 +16,14 @@ public:
   void setRunning(bool running);
   int getId();
   int getTreeId();
+  int getCutTreeCounter();
   std::string getState();
 private:
   std::thread td;
   std::mutex mtx;
   int id;
   int treeId;
+  int cutTreeCounter = {0};
   bool running = true; 
   std::atomic<LumberjackState> state {LumberjackState::WAITING};
   vector<Tree*> trees;
