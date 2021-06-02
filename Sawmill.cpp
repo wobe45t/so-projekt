@@ -82,3 +82,13 @@ bool Sawmill::requestBoard() {
   cv.wait(ul, [&] {return !workRequested ? true : false;});
   return true;
 }
+// bool Sawmill::scheduleWork() { 
+
+// }
+// bool Sawmill::unscheduleWork() {
+//   resources->mtx2.unlock();
+// }
+
+bool Sawmill::getWorkRequested() {
+  return workRequested;
+}

@@ -17,7 +17,7 @@ public:
   float getProgress();
   std::vector<int> getOrder();
 private:
-  TransportState transportState {TransportState::WAITING};
+  TransportState transportState {TransportState::FROM_SHOP};
   Resources * resources;
   float progress = 0.0f;
   int transportCounter = 0;

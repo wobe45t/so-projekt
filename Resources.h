@@ -21,6 +21,7 @@ public:
   int getShortBoards();
   int getNormalBoards();
   std::string getMessage();
+  std::mutex mtx2;
 private:
   int wood = 0;
   int shortBoard = 0;

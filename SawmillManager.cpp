@@ -30,7 +30,7 @@ void SawmillManager::cycle()
           sawmills[2]->requestBoard();
         }
       } else { // no need for long or normal atm
-        if(sawmills[0]->getState() == SawmillState::WAITING && orderedBoards[9]>0) {
+        if(sawmills[0]->getState() == SawmillState::WAITING && orderedBoards[0]>0) {
           sawmills[0]->requestBoard();
         } else if(sawmills[1]->getState() == SawmillState::WAITING && orderedBoards[1] > 0) {
           sawmills[1]->requestBoard();

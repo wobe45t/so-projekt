@@ -21,7 +21,10 @@ public:
   float getProgress();
   int wait_counter = 0;
   bool requestBoard();
+  // bool scheduleWork();
+  // bool unscheduleWork();
   SawmillState getState();
+  bool getWorkRequested();
 private:
   BoardType boardType;
   std::atomic<SawmillState> state {SawmillState::WAITING};
