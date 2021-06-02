@@ -52,7 +52,7 @@ void Lumberjack::cycle()
         usleep(sleepTime);
       }
       treeId = 0;
-      
+      cutTreeCounter += 1;
     }
     state = LumberjackState::RESTING;
     usleep(1000000);
@@ -70,7 +70,7 @@ int Lumberjack::getId()
 {
   return id;
 }
-
+int Lumberjack::getCutTreeCounter() { return cutTreeCounter; }
 int Lumberjack::getTreeId()
 {
   return treeId;
