@@ -67,6 +67,13 @@ std::string Sawmill::getWorkRequestStr() {
 SawmillState Sawmill::getState()  {
   return state;
 }
+void Sawmill::setPriority(bool priority) {
+  this->priority = priority;
+}
+
+bool Sawmill::getPriority() {
+  return priority;
+}
 
 void Sawmill::setRunning(bool running){
   this->running = running;
@@ -78,16 +85,10 @@ float Sawmill::getProgress() {
 
 bool Sawmill::requestBoard() { 
   workRequested = true;
-  std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return !workRequested ? true : false;});
+  // std::unique_lock<std::mutex> ul(mtx);
+  // cv.wait(ul, [&] {return !workRequested ? true : false;});
   return true;
 }
-// bool Sawmill::scheduleWork() { 
-
-// }
-// bool Sawmill::unscheduleWork() {
-//   resources->mtx2.unlock();
-// }
 
 bool Sawmill::getWorkRequested() {
   return workRequested;

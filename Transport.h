@@ -2,6 +2,7 @@
 #include <thread>
 #include <atomic>
 #include "TransportState.h"
+#include "BoardType.h"
 #include "Resources.h"
 #include <random>
 #include <vector>
@@ -13,15 +14,25 @@ public:
   void cycle();
   std::string getState();
   int getTransportCounter();
+  int getShortBoards();
+  int getNormalBoards();
+  int getLongBoards();
+  int getOrderedShortBoards();
+  int getOrderedNormalBoards();
+  int getOrderedLongBoards();
   void generateOrder();
   float getProgress();
   std::vector<int> getOrder();
+  BoardType getTopBoardPriority();
 private:
   TransportState transportState {TransportState::FROM_SHOP};
   Resources * resources;
   float progress = 0.0f;
   int transportCounter = 0;
   bool running = true;
+  std::atomic<int> orderedShortBoards {0};
+  std::atomic<int> orderedNormalBoards {0};
+  std::atomic<int> orderedLongBoards {0};
   std::atomic<int> shortBoards {0};
   std::atomic<int> normalBoards {0};
   std::atomic<int> longBoards {0};

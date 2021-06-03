@@ -121,14 +121,27 @@ void UI::update()
     mvprintw((int)trees.size() + 7, VERTICAL_SPLIT + 2, "WOOD");
     mvprintw((int)trees.size() + 7, VERTICAL_SPLIT + 14, std::to_string(resources->getWood()).c_str());
     attron(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 2, "BOARDS:");
+    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 2, "BOARDS");
+    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 11, "STORAGE");
+    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 20, "GOT");
+    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 24, "/");
+    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 26, "ORDER");
     attroff(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 4, "-LONG");
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 2, "-LONG");
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 14, std::to_string(resources->getLongBoards()).c_str());
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 4, "-NORMAL");
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 22, std::to_string(transport->getLongBoards()).c_str());
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 23, " / ");
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(transport->getOrderedLongBoards()).c_str());
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 2, "-NORMAL");
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 14, std::to_string(resources->getNormalBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 4, "-SHORT");
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 22, std::to_string(transport->getNormalBoards()).c_str());
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 23, " / ");
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 26, std::to_string(transport->getOrderedNormalBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 2, "-SHORT");
     mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 22, std::to_string(transport->getShortBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 23, " / ");
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 26, std::to_string(transport->getOrderedShortBoards()).c_str());
 
     //
     // SAWMILLS
@@ -138,8 +151,8 @@ void UI::update()
     attroff(COLOR_PAIR(1));
     for(int i = 0; i < (int)sawmills.size(); i++) {
       mvprintw((int)trees.size()+5+i, 5, (sawmills[i]->getBoardTypeStr()).c_str());
-      mvprintw((int)trees.size()+5+i, 15, sawmills[i]->getStateStr().c_str());
-      mvprintw((int)trees.size()+5+i, 25, sawmills[i]->getWorkRequestStr().c_str());
+      mvprintw((int)trees.size()+5+i, 13, sawmills[i]->getStateStr().c_str());
+      // mvprintw((int)trees.size()+5+i, 25, sawmills[i]->getWorkRequestStr().c_str());
       attron(COLOR_PAIR(2));
       mvprintw((int)trees.size()+5+i, 31, progressBar(sawmills[i]->getProgress(), 30).c_str());
       mvprintw((int)trees.size()+5+i, 62, (std::to_string((int)sawmills[i]->getProgress())).c_str());
@@ -151,6 +164,9 @@ void UI::update()
     //
     attron(COLOR_PAIR(1));
     mvprintw(HORIZONTAL_SPLIT + 6, 10, "TRANSPORT");
+    mvprintw(HORIZONTAL_SPLIT + 6, 20, std::to_string(transport->getShortBoards()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 6, 25, std::to_string(transport->getNormalBoards()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 6, 30, std::to_string(transport->getLongBoards()).c_str());
     attroff(COLOR_PAIR(1));
     mvprintw(HORIZONTAL_SPLIT + 7, 5, "COUNTER");
     mvprintw(HORIZONTAL_SPLIT + 7, 15, "STATE");

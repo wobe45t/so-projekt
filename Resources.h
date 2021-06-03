@@ -20,15 +20,22 @@ public:
   int getLongBoards();
   int getShortBoards();
   int getNormalBoards();
+  // FRESH FUNCTIONS
+  BoardType requestAnyBoard(int shortBoards, int normalBoards, int longBoards);
+  int requestAllShortBoards();
+  int requestAllNormalBoards();
+  int requestAllLongBoards();
   std::string getMessage();
-  std::mutex mtx2;
 private:
   int wood = 0;
   int shortBoard = 0;
   int longBoard = 0;
   int normalBoard = 0;
+  int boardSum = 0;
   int furniture = 0;
   std::string message;
+  std::mutex board_mutex;
   std::mutex mtx;
+  std::condition_variable board_cv;
   std::condition_variable cv;
 };

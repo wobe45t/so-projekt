@@ -21,9 +21,9 @@ public:
   float getProgress();
   int wait_counter = 0;
   bool requestBoard();
-  // bool scheduleWork();
-  // bool unscheduleWork();
   SawmillState getState();
+  void setPriority(bool priority);
+  bool getPriority();
   bool getWorkRequested();
 private:
   BoardType boardType;
@@ -32,6 +32,7 @@ private:
   float progress = 0.0f;
   Resources * resources;
   bool running = true;
+  std::atomic<bool> priority {false};
   std::condition_variable cv;
   std::mutex mtx;
   std::thread td;
