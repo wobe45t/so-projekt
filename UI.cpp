@@ -132,16 +132,19 @@ void UI::update()
     mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedLongBoards()).c_str());
     mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 23, " / ");
     mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedLongBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 29, std::string(sawmillManager->getLongBoardsNeeded() ? "T": "F").c_str());
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 2, "-NORMAL");
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 14, std::to_string(resources->getNormalBoards()).c_str());
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedNormalBoards()).c_str());
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 23, " / ");
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedNormalBoards()).c_str());
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 29, std::string(sawmillManager->getNormalBoardsNeeded() ? "T": "F").c_str());
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 2, "-SHORT");
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedShortBoards()).c_str());
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 23, " / ");
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedShortBoards()).c_str());
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 29, std::string(sawmillManager->getShortBoardsNeeded() ? "T": "F").c_str());
 
     //
     // SAWMILLS
@@ -152,7 +155,7 @@ void UI::update()
     for(int i = 0; i < (int)sawmills.size(); i++) {
       mvprintw((int)trees.size()+5+i, 5, (sawmills[i]->getBoardTypeStr()).c_str());
       mvprintw((int)trees.size()+5+i, 13, sawmills[i]->getStateStr().c_str());
-      // mvprintw((int)trees.size()+5+i, 25, sawmills[i]->getWorkRequestStr().c_str());
+      mvprintw((int)trees.size()+5+i, 22, sawmills[i]->getSpeedStateStr().c_str());
       attron(COLOR_PAIR(2));
       mvprintw((int)trees.size()+5+i, 31, progressBar(sawmills[i]->getProgress(), 30).c_str());
       mvprintw((int)trees.size()+5+i, 62, (std::to_string((int)sawmills[i]->getProgress())).c_str());

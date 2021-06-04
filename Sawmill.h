@@ -7,6 +7,7 @@
 #include <condition_variable>
 #include "Resources.h"
 #include "SawmillState.h"
+#include "SawmillSpeedState.h"
 #include "BoardType.h"
 class Sawmill {
 public:
@@ -26,9 +27,12 @@ public:
   bool getPriority();
   bool getWorkRequested();
   void setWork(bool work);
+  void setSpeedState(SawmillSpeedState speedState);
+  std::string getSpeedStateStr();
 private:
   BoardType boardType;
   std::atomic<SawmillState> state {SawmillState::WAIT};
+  SawmillSpeedState speedState = {SawmillSpeedState::NO_ORDER};
   std::atomic<bool> workRequested {false};
   float progress = 0.0f;
   Resources * resources;
@@ -36,5 +40,6 @@ private:
   std::atomic<bool> priority {false};
   std::condition_variable cv;
   std::mutex mtx;
+  std::mutex mtx2; // test mutex
   std::thread td;
 };

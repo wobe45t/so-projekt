@@ -1,6 +1,7 @@
 #include "SawmillManager.h"
 #include "BoardType.h"
 #include "SawmillState.h"
+#include "SawmillSpeedState.h"
 SawmillManager::SawmillManager(Resources *resources, std::vector<Sawmill *> sawmills): sawmills(sawmills), resources(resources) ,td(&SawmillManager::cycle, this)
 {
 }
@@ -18,32 +19,35 @@ void SawmillManager::cycle()
     while(orderRdy) {
       // check if all boards are prepared - if so break the loop
       if(preparedShortBoards >= orderedShortBoards) {
+        std::lock_guard<std::mutex> lock(mtx);
         shortBoardsNeeded = false;
-        // message = "shortBoardsNotNeeded";
-        // sawmills[0]->setWork(false);
+        // sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
+        std::lock_guard<std::mutex> lock(mtx);
         shortBoardsNeeded = true;
-        // sawmills[0]->setWork(true);
+        // sawmills[0]->setSpeedState(SawmillSpeedState::ORDER);
       }
       // FIXME problem when this block is set so when samill starts work
       if(preparedNormalBoards >= orderedNormalBoards) {
+        std::lock_guard<std::mutex> lock(mtx);
         normalBoardsNeeded = false;
-        // message = "normalBoardsNotNeeded";
-        // sawmills[1]->setWork(false);
+        // sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
+        std::lock_guard<std::mutex> lock(mtx);
         normalBoardsNeeded = true;
-        // sawmills[1]->setWork(true);
+        // sawmills[1]->setSpeedState(SawmillSpeedState::ORDER);
       }
       if(preparedLongBoards >= orderedLongBoards) {
+        std::lock_guard<std::mutex> lock(mtx);
         longBoardsNeeded = false;
-        // message = "longBoardsNotNeeded";
-        // sawmills[2]->setWork(false);
+        // sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
+        std::lock_guard<std::mutex> lock(mtx);
         longBoardsNeeded = true;
-        // sawmills[2]->setWork(true);
+        // sawmills[2]->setSpeedState(SawmillSpeedState::ORDER);
       }
       // request single board -> when returned increment counter of given type and check if boards are still needed
       message = std::string(shortBoardsNeeded ? "TRUE" : "FALSE") + " " + std::string(normalBoardsNeeded ? "TRUE" : "FALSE") + " " +std::string(longBoardsNeeded ? "TRUE" : "FALSE");
@@ -95,9 +99,7 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
   orderedShortBoards = shortBoards;
   orderedNormalBoards = normalBoards;
   orderedLongBoards = longBoards;
-  shortBoardsNeeded = true;
-  normalBoardsNeeded = true;
-  longBoardsNeeded = true;
+  shortBoardsNeeded = normalBoardsNeeded = longBoardsNeeded = true;
   // here i could ask for all possible resources needed (produced when transport was being delivered)
   orderRdy = true;
   std::unique_lock<std::mutex> ul(mtx);
@@ -158,4 +160,20 @@ int SawmillManager::getOrderedShortBoards()
 int SawmillManager::getOrderedNormalBoards()
 {
   return orderedNormalBoards;
+}
+
+bool SawmillManager::getLongBoardsNeeded()
+{
+  return longBoardsNeeded;
+}
+
+bool SawmillManager::getShortBoardsNeeded()
+{
+  return shortBoardsNeeded;
+
+}
+
+bool SawmillManager::getNormalBoardsNeeded()
+{
+  return normalBoardsNeeded;
 }

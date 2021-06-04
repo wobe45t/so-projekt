@@ -6,26 +6,33 @@ Sawmill::Sawmill(Resources *resources) : resources(resources)
 Sawmill::Sawmill(Resources *resources, BoardType boardType) : resources(resources), boardType(boardType), td(&Sawmill::cycle, this)
 {
 }
-
+// NOTE it works for now (04 14.06)
 void Sawmill::cycle() {
   workRequested = true;
-  int random_delay = 0;
+  int random_delay;
+  int sleep_time; // depending on SawmillSpeedState
   while(running){
     state = SawmillState::WAIT;
     progress = 0.0f;
     random_delay = rand() % 10000;
-    if(workRequested) {
-      // add work speed in separate state
-      // THIS IS CORRECT
-      state = SawmillState::WORK;
-      resources->requestWood(5);
-      while(progress<=100.0f) {
-        progress+=1;
-        usleep(50000 + random_delay);
+    resources->requestWood(5);
+    while(progress<=100.0f) {
+    state = SawmillState::WORK;
+      progress+=1;
+      mtx.lock();
+      if(speedState == SawmillSpeedState::NO_ORDER) {
+        sleep_time = 200000;
       }
-      // FIXME a moze po zmianie tych mutexow tutaj sie sypie w addBoard
-      resources->addBoard(1, boardType);
+      else if(speedState == SawmillSpeedState::ORDER) {
+        sleep_time = 50000;
+      }
+      else {
+        sleep_time = 25000;
+      }
+      mtx.unlock();
+      usleep(sleep_time + random_delay);
     }
+    resources->addBoard(1, boardType);
   }
 }
 
@@ -41,11 +48,26 @@ std::string Sawmill::getBoardTypeStr() {
     return "UNKNOWN";
   }
 }
-
+std::string Sawmill::getSpeedStateStr() {
+  std::lock_guard<std::mutex> lock(mtx);
+  switch(speedState) {
+    case SawmillSpeedState::NO_ORDER:
+      return "NO_ORDER";
+    case SawmillSpeedState::ORDER:
+      return "NORMAL";
+    case SawmillSpeedState::PRIORITY:
+      return "PRIORITY";
+    default:
+      return "UNKNOWN";
+  }
+}
 BoardType Sawmill::getBoardType() {
   return boardType;
 }
-
+void Sawmill::setSpeedState(SawmillSpeedState speedState) {
+  std::lock_guard<std::mutex> lock(mtx);
+  this->speedState = speedState;
+}
 
 std::string Sawmill::getStateStr() {
   switch(state) {
