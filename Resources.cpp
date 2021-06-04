@@ -21,68 +21,65 @@ void Resources::addNormalBoard() {
   normalBoard++;
   cv.notify_one();
 }
-BoardType Resources::requestAnyBoard(int shortBoards, int normalBoards, int longBoards) { // parameters could be changed to neededShortBoards etc.
-  int previousBoards = shortBoard + normalBoard + longBoard;
+BoardType Resources::requestAnyBoard(bool shortBoardsNeeded, bool normalBoardsNeeded, bool longBoardsNeeded) {
   // moge tutaj zapisac stany poprzednich desek i sprawdzac wszystko w tym jednym cv.wait i przypisac po prostu typ deski ktory dostalo ?
   int previousShortBoards = shortBoard;
   int previousNormalBoards = normalBoard;
   int previousLongBoards = longBoard;
   BoardType returnBoard;
-  std::unique_lock<std::mutex> ul(board_mutex);
-  int DEBUG_COUNTER = 0;
-  board_cv.wait(ul, [&] {
-      if(previousShortBoards != shortBoard && shortBoards > 0) {
-        returnBoard = (BoardType)0;
-        DEBUG_COUNTER ++;
-      } else if(previousNormalBoards != normalBoard && normalBoards > 0){
-        returnBoard = (BoardType)1;
-        DEBUG_COUNTER ++;
-      } else if(previousLongBoards != longBoard && longBoards > 0) {
-        returnBoard = (BoardType)2;
-        DEBUG_COUNTER ++;
+  bool result = true;
+  std::unique_lock<std::mutex> ul(mtx);
+  cv.wait(ul, [&] {
+      if(previousShortBoards < shortBoard ) {
+        returnBoard = BoardType::SHORT;
+        if(shortBoardsNeeded) {
+          shortBoard--;
+          return true;
+        }
       }
-      if(DEBUG_COUNTER == 2) {
-        throw std::logic_error("DEBUG_COUNTER="+ std::to_string(DEBUG_COUNTER) + " -> SHOULD BE 0|1");
+      if(previousNormalBoards < normalBoard){
+        returnBoard = BoardType::NORMAL;
+        if(normalBoardsNeeded) {
+          normalBoard --;
+          return true;
+        }
       }
-      return (previousBoards + 1 == shortBoard + normalBoard + longBoard) ? true : false;
-      // ^ tutaj sprawdzam czy boardy sie roznia. Jezeli w wczesniejszym ifie odejme to wtedy ilosc bedzie sie zgadzac.
+      if(previousLongBoards < longBoard) {
+        returnBoard = BoardType::LONG;
+        if(longBoardsNeeded) {
+          longBoard--;
+          return true;
+        }
+      }
+      return false;
   });
-  if(returnBoard == BoardType::SHORT) {
-    shortBoard -= 1;
-  } else if(returnBoard == BoardType::NORMAL) {
-    normalBoard -= 1;
-  } else if(returnBoard == BoardType::LONG) {
-    longBoard -= 1;
-  } else {
-    throw std::logic_error("NO SUCH BOARD ERROR");
-  }
   return returnBoard;
 }
 
 int Resources::requestAllShortBoards() {
   int boards;
-  board_mutex.lock(); // FIXME change to lock_guard
+  mtx.lock(); // FIXME change to lock_guard
   boards = shortBoard;
   shortBoard = 0;
-  board_mutex.unlock();
+  mtx.unlock();
   return boards;
 }
 
 int Resources::requestAllNormalBoards() {
   int boards;
-  board_mutex.lock();
+  mtx.lock();
   boards = normalBoard;
   normalBoard = 0;
-  board_mutex.unlock();
+  mtx.unlock();
   return boards;
 }
 
 int Resources::requestAllLongBoards() {
   int boards;
-  board_mutex.lock();
+  mtx.lock();
   boards = longBoard;
   longBoard = 0;
-  board_mutex.unlock();
+  mtx.unlock();
   return boards;
 }
 
@@ -100,7 +97,7 @@ void Resources::addBoard(int boards, BoardType boardType) {
     break;
   }
   boardSum += boards;
-  board_cv.notify_all();
+  cv.notify_all();
 }
 
 int Resources::requestBoard(int boards, BoardType boardType) {

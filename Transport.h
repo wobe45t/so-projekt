@@ -4,13 +4,14 @@
 #include "TransportState.h"
 #include "BoardType.h"
 #include "Resources.h"
+#include "SawmillManager.h"
 #include <random>
 #include <vector>
 #include <condition_variable>
 #include <mutex>
 class Transport {
 public:
-  Transport(Resources * resources);
+  Transport(SawmillManager * sawmillManager, Resources * resources);
   void cycle();
   std::string getState();
   int getTransportCounter();
@@ -27,6 +28,7 @@ public:
 private:
   TransportState transportState {TransportState::FROM_SHOP};
   Resources * resources;
+  SawmillManager * sawmillManager;
   float progress = 0.0f;
   int transportCounter = 0;
   bool running = true;

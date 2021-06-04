@@ -8,22 +8,22 @@ Sawmill::Sawmill(Resources *resources, BoardType boardType) : resources(resource
 }
 
 void Sawmill::cycle() {
+  workRequested = true;
   int random_delay = 0;
   while(running){
-    state = SawmillState::WAITING;
+    state = SawmillState::WAIT;
     progress = 0.0f;
     random_delay = rand() % 10000;
-    if(workRequested == true) {
+    if(workRequested) {
+      // add work speed in separate state
+      // THIS IS CORRECT
+      state = SawmillState::WORK;
       resources->requestWood(5);
-      state = SawmillState::WORKING;
-      workRequested = false;
-      // - notify the manager that the work started
-      // - manager can choose another sawmill to schedule the work
-      cv.notify_one(); 
       while(progress<=100.0f) {
         progress+=1;
         usleep(50000 + random_delay);
       }
+      // FIXME a moze po zmianie tych mutexow tutaj sie sypie w addBoard
       resources->addBoard(1, boardType);
     }
   }
@@ -49,9 +49,9 @@ BoardType Sawmill::getBoardType() {
 
 std::string Sawmill::getStateStr() {
   switch(state) {
-    case SawmillState::WORKING:
+    case SawmillState::WORK:
     return "WORKING";
-    case SawmillState::WAITING:
+    case SawmillState::WAIT:
     return "WAITING";
     default:
     return "UNKNOWN";
@@ -82,7 +82,11 @@ void Sawmill::setRunning(bool running){
 float Sawmill::getProgress() {
   return progress;
 }
-
+void Sawmill::setWork(bool work) {
+  std::lock_guard<std::mutex> lock(mtx);
+  // workRequested = work;
+}
+// FIXME not used
 bool Sawmill::requestBoard() { 
   workRequested = true;
   // std::unique_lock<std::mutex> ul(mtx);

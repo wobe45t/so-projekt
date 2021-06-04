@@ -21,7 +21,7 @@ public:
   int getShortBoards();
   int getNormalBoards();
   // FRESH FUNCTIONS
-  BoardType requestAnyBoard(int shortBoards, int normalBoards, int longBoards);
+  BoardType requestAnyBoard(bool shortBoards, bool normalBoards, bool longBoards);
   int requestAllShortBoards();
   int requestAllNormalBoards();
   int requestAllLongBoards();

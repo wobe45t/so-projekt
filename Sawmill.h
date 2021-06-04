@@ -25,9 +25,10 @@ public:
   void setPriority(bool priority);
   bool getPriority();
   bool getWorkRequested();
+  void setWork(bool work);
 private:
   BoardType boardType;
-  std::atomic<SawmillState> state {SawmillState::WAITING};
+  std::atomic<SawmillState> state {SawmillState::WAIT};
   std::atomic<bool> workRequested {false};
   float progress = 0.0f;
   Resources * resources;

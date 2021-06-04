@@ -127,21 +127,21 @@ void UI::update()
     mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 24, "/");
     mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 26, "ORDER");
     attroff(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 2, "-LONG");
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 14, std::to_string(resources->getLongBoards()).c_str());
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 22, std::to_string(transport->getLongBoards()).c_str());
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 23, " / ");
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(transport->getOrderedLongBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 2, "-LONG");
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 14, std::to_string(resources->getLongBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedLongBoards()).c_str());
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 23, " / ");
+    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedLongBoards()).c_str());
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 2, "-NORMAL");
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 14, std::to_string(resources->getNormalBoards()).c_str());
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 22, std::to_string(transport->getNormalBoards()).c_str());
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedNormalBoards()).c_str());
     mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 23, " / ");
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 26, std::to_string(transport->getOrderedNormalBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 2, "-SHORT");
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 22, std::to_string(transport->getShortBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 23, " / ");
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 26, std::to_string(transport->getOrderedShortBoards()).c_str());
+    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedNormalBoards()).c_str());
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 2, "-SHORT");
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedShortBoards()).c_str());
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 23, " / ");
+    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedShortBoards()).c_str());
 
     //
     // SAWMILLS

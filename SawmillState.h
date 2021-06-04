@@ -1,3 +1,3 @@
 #pragma once
 
-enum class SawmillState {WAITING, WORKING};
+enum class SawmillState {WAIT, WORK};

@@ -1,9 +1,9 @@
 #include "Transport.h"
 #include <unistd.h>
 
-#define RAND_RANGE 10
+#define RAND_RANGE 5
 
-Transport::Transport(Resources * resources) : resources(resources), td(&Transport::cycle, this)
+Transport::Transport(SawmillManager * sawmillManager, Resources * resources) : resources(resources), sawmillManager(sawmillManager), td(&Transport::cycle, this)
 {
 
 }
@@ -19,22 +19,7 @@ void Transport::cycle() {
         orderReady = true;
         cv.notify_one();
       }
-      shortBoards = resources->requestAllShortBoards();
-      normalBoards = resources->requestAllNormalBoards();
-      longBoards = resources->requestAllLongBoards();
-      // FIXME AKTUALNIE ^ TE FUNKCJE NIE PATRZA ILE JEST W ORDERZE TYLKO WSZYSTKO DAJA .
-      while(orderedLongBoards > longBoards || orderedNormalBoards > normalBoards || orderedShortBoards > shortBoards) {
-        receivedBoard = resources->requestAnyBoard(orderedLongBoards - longBoards, orderedNormalBoards - normalBoards, orderedShortBoards - shortBoards);
-        if(receivedBoard == BoardType::SHORT) {
-          shortBoards += 1;
-        }
-        else if(receivedBoard == BoardType::NORMAL) {
-          normalBoards += 1;
-        }
-        else if(receivedBoard == BoardType::LONG) {
-          longBoards += 1;
-        }
-      }
+      sawmillManager->getPreparedOrder(orderedShortBoards, orderedNormalBoards, orderedLongBoards);
       shortBoards = longBoards = normalBoards = 0;
       transportCounter++;
       transportState = TransportState::TO_SHOP;
@@ -58,37 +43,37 @@ void Transport::cycle() {
     progress=0.0f;
   }
 }
-BoardType Transport::getTopBoardPriority() {
-  BoardType priorityBoard;
+// BoardType Transport::getTopBoardPriority() {
+//   BoardType priorityBoard;
 
-  if(orderedLongBoards >= orderedNormalBoards) {
-    if(longBoards>0) {
-      priorityBoard = (BoardType)2;
-    } else if(normalBoards > 0) {
-      priorityBoard = (BoardType)1;
-    } else if (shortBoards > 0) {
-      priorityBoard = (BoardType)0;
-    }
-  } else if (orderedNormalBoards >= orderedShortBoards){ // no need for long boards atm
-    if(normalBoards>0) {
-      priorityBoard = (BoardType)1;
-    } else if(shortBoards > 0) {
-      priorityBoard = (BoardType)0;
-    } else if (longBoards > 0) {
-      priorityBoard = (BoardType)2;
-    }
-  } else { // no need for long or normal atm
-    if(shortBoards>0) {
-      priorityBoard = (BoardType)0;
-    } else if(normalBoards > 0) {
-      priorityBoard = (BoardType)1;
-    } else if (longBoards > 0) {
-      priorityBoard = (BoardType)2;
-    }
-  }
-  // FIXME dodac tutaj else statement ze stanem NO-PRIORITY~ zeby pokazac to w UI
-  return priorityBoard;
-}
+//   if(orderedLongBoards >= orderedNormalBoards) {
+//     if(longBoards>0) {
+//       priorityBoard = (BoardType)2;
+//     } else if(normalBoards > 0) {
+//       priorityBoard = (BoardType)1;
+//     } else if (shortBoards > 0) {
+//       priorityBoard = (BoardType)0;
+//     }
+//   } else if (orderedNormalBoards >= orderedShortBoards){ // no need for long boards atm
+//     if(normalBoards>0) {
+//       priorityBoard = (BoardType)1;
+//     } else if(shortBoards > 0) {
+//       priorityBoard = (BoardType)0;
+//     } else if (longBoards > 0) {
+//       priorityBoard = (BoardType)2;
+//     }
+//   } else { // no need for long or normal atm
+//     if(shortBoards>0) {
+//       priorityBoard = (BoardType)0;
+//     } else if(normalBoards > 0) {
+//       priorityBoard = (BoardType)1;
+//     } else if (longBoards > 0) {
+//       priorityBoard = (BoardType)2;
+//     }
+//   }
+//   // FIXME dodac tutaj else statement ze stanem NO-PRIORITY~ zeby pokazac to w UI
+//   return priorityBoard;
+// }
 
 int Transport::getShortBoards() {
   return shortBoards;

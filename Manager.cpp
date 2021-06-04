@@ -12,8 +12,8 @@ Manager::Manager()
   trees = std::vector<Tree *>();
   sawmills = std::vector<Sawmill * >();
   resources = new Resources();
-  transport = new Transport(resources);
-  //sawmill = new Sawmill(resources);
+  sawmillManager = new SawmillManager(resources, sawmills);
+  transport = new Transport(sawmillManager, resources);
 
   for (int i = 0; i < TREES; i++)
   {
@@ -27,7 +27,6 @@ Manager::Manager()
   for (int i = 0; i< SAWMILLS; i++) {
     sawmills.push_back(new Sawmill(resources, (BoardType)i));
   }
-  sawmillManager = new SawmillManager(resources, sawmills, transport);
 }
 
 void Manager::setRunning(bool running)
