@@ -27,11 +27,9 @@ public:
   Sawmill* getSawmill();
   SawmillManager * getSawmillManager();
   Transport * getTransport();
-  std::vector<Sawmill*> getSawmills();
 private:
   std::vector<Tree *> trees;
   std::vector<Lumberjack *> lumberjacks;
-  std::vector<Sawmill *> sawmills;
   Nature * nature;
   Resources * resources;
   Sawmill * sawmill;

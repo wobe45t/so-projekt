@@ -3,12 +3,13 @@
 #include <vector>
 #include <mutex>
 #include "Sawmill.h"
+#include "SawmillSpeedState.h"
 #include "Resources.h"
 #include "BoardType.h"
 #include <condition_variable>
 class SawmillManager {
 public:
-  SawmillManager(Resources* resources, std::vector<Sawmill*> sawmills);
+  SawmillManager(Resources* resources);
   void cycle();
   void setRunning(bool running);
   void getResources(int shortBoard, int normalBoard, int longBoard);
@@ -26,6 +27,13 @@ public:
   bool getLongBoardsNeeded();
   bool getShortBoardsNeeded();
   bool getNormalBoardsNeeded();
+
+  int getSawmillProgress(int index);
+  std::string getSawmillSpeedStateStr(int index);
+  std::string getSawmillStateStr(int index);
+  std::string getSawmillBoardTypeStr(int index);
+  int getOrderProgress();
+  int getOrderSum();
   void getPreparedOrder(int shortBoards, int normalBoards, int longBoards);
   std::string getMessage();
 private:

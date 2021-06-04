@@ -2,8 +2,14 @@
 #include "BoardType.h"
 #include "SawmillState.h"
 #include "SawmillSpeedState.h"
-SawmillManager::SawmillManager(Resources *resources, std::vector<Sawmill *> sawmills): sawmills(sawmills), resources(resources) ,td(&SawmillManager::cycle, this)
+#define SAWMILLS 3
+SawmillManager::SawmillManager(Resources *resources): td(&SawmillManager::cycle, this)
 {
+  this->resources = resources;
+  // create sawmills locally
+  for(int i=0; i<SAWMILLS; i++) {
+    sawmills.push_back(new Sawmill(resources, (BoardType)i));
+  }
 }
 
 void SawmillManager::cycle()
@@ -18,36 +24,35 @@ void SawmillManager::cycle()
 
     while(orderRdy) {
       // check if all boards are prepared - if so break the loop
-      if(preparedShortBoards >= orderedShortBoards) {
+      if(preparedShortBoards == orderedShortBoards) {
         std::lock_guard<std::mutex> lock(mtx);
         shortBoardsNeeded = false;
-        // sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
+        sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
         std::lock_guard<std::mutex> lock(mtx);
         shortBoardsNeeded = true;
-        // sawmills[0]->setSpeedState(SawmillSpeedState::ORDER);
+        sawmills[0]->setSpeedState(SawmillSpeedState::ORDER);
       }
-      // FIXME problem when this block is set so when samill starts work
-      if(preparedNormalBoards >= orderedNormalBoards) {
+      if(preparedNormalBoards == orderedNormalBoards) {
         std::lock_guard<std::mutex> lock(mtx);
         normalBoardsNeeded = false;
-        // sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
+        sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
         std::lock_guard<std::mutex> lock(mtx);
         normalBoardsNeeded = true;
-        // sawmills[1]->setSpeedState(SawmillSpeedState::ORDER);
+        sawmills[1]->setSpeedState(SawmillSpeedState::ORDER);
       }
-      if(preparedLongBoards >= orderedLongBoards) {
+      if(preparedLongBoards == orderedLongBoards) {
         std::lock_guard<std::mutex> lock(mtx);
         longBoardsNeeded = false;
-        // sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
+        sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
         std::lock_guard<std::mutex> lock(mtx);
         longBoardsNeeded = true;
-        // sawmills[2]->setSpeedState(SawmillSpeedState::ORDER);
+        sawmills[2]->setSpeedState(SawmillSpeedState::ORDER);
       }
       // request single board -> when returned increment counter of given type and check if boards are still needed
       message = std::string(shortBoardsNeeded ? "TRUE" : "FALSE") + " " + std::string(normalBoardsNeeded ? "TRUE" : "FALSE") + " " +std::string(longBoardsNeeded ? "TRUE" : "FALSE");
@@ -66,28 +71,6 @@ void SawmillManager::cycle()
       }
       cv.notify_one();
     }
-      // if any of the board type is needed continue to work, else break
-    // if(!shortBoardsNeeded && !normalBoardsNeeded && !longBoardsNeeded) {
-    //   orderRdy = false;
-    //   message = "BREAKING THE LOOP";
-    //   cv.notify_one();
-    //   break;
-    // }
-    // set prepared*Boards to 0 and send notification to TRANSPORT thread that the boards are prepared.
-    // while(priorityChangeProgress < 100) {
-    //   usleep(priorityChangeTime/100);
-    //   priorityChangeProgress += 1;
-    // }
-    // priorityBoard = transport->getTopBoardPriority();
-    // for(int i=0; i<(int)sawmills.size(); i++) {
-    //   sawmills[i]->requestBoard();
-    //   if(sawmills[i]->getBoardType() == priorityBoard) {
-    //     sawmills[i]->setPriority(true);
-    //   }
-    //   else {
-    //     sawmills[i]->setPriority(false);
-    //   }
-    // }
   }
 }
 // ta funckja mogla by sie nazywac orderBoards(short, normal, long)
@@ -112,7 +95,38 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
   orderedShortBoards = orderedNormalBoards = orderedLongBoards = 0;
   orderRdy = false;
 }
-
+int SawmillManager::getOrderProgress() {
+  int preparedSum = preparedShortBoards + preparedNormalBoards + preparedLongBoards;
+  int orderedSum = orderedShortBoards + orderedNormalBoards + orderedLongBoards;
+  if(orderedSum == 0) {
+    return 0;
+  }
+  return (int)((preparedSum/(float)orderedSum)*100);
+}
+int SawmillManager::getOrderSum() {
+  return orderedShortBoards + orderedNormalBoards + orderedLongBoards;
+}
+//  NOTE with mutexes it doent work - stuck
+std::string SawmillManager::getSawmillBoardTypeStr(int index) {
+  // mtx2.lock();
+  return sawmills[index]->getBoardTypeStr();
+  // mtx2.unlock();
+}
+int SawmillManager::getSawmillProgress(int index) {
+  // mtx2.lock();
+  return sawmills[index]->getProgress();
+  // mtx2.unlock();
+}
+std::string SawmillManager::getSawmillSpeedStateStr(int index) {
+  // mtx2.lock();
+  return sawmills[index]->getSpeedStateStr();
+  // mtx2.unlock();
+}
+std::string SawmillManager::getSawmillStateStr(int index) {
+  // mtx2.lock();
+  return sawmills[index]->getStateStr();
+  // mtx2.unlock();
+}
 std::string SawmillManager::getMessage() {
   return message;
 }

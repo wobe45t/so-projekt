@@ -24,10 +24,10 @@ void Sawmill::cycle() {
         sleep_time = 200000;
       }
       else if(speedState == SawmillSpeedState::ORDER) {
-        sleep_time = 50000;
+        sleep_time = 100000;
       }
       else {
-        sleep_time = 25000;
+        sleep_time = 60000;
       }
       mtx.unlock();
       usleep(sleep_time + random_delay);

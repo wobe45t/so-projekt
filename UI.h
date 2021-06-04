@@ -32,7 +32,7 @@ private:
     std::mutex mtx;
     std::vector<Tree*> trees;
     std::vector<Lumberjack*> lumberjacks;
-    std::vector<Sawmill*> sawmills;
+    // std::vector<Sawmill*> sawmills;
     Nature * nature;
     Manager * manager;
     Sawmill * sawmill;

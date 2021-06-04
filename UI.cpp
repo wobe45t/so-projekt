@@ -11,7 +11,7 @@ UI::UI(Manager *manager) : manager(manager)
   lumberjacks = manager->getLumberjacks();
   nature = manager->getNature();
   resources = manager->getResources();
-  sawmills = manager->getSawmills();
+  // sawmills = manager->getSawmills();
   transport = manager->getTransport();
   sawmillManager = manager->getSawmillManager();
 }
@@ -146,19 +146,23 @@ void UI::update()
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedShortBoards()).c_str());
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 29, std::string(sawmillManager->getShortBoardsNeeded() ? "T": "F").c_str());
 
+    mvprintw((int)trees.size() + 12, BORDER_RIGHT - 10, std::to_string(sawmillManager->getOrderProgress()).c_str());
+    mvprintw((int)trees.size() + 12, BORDER_RIGHT - 9, " / ");
+    mvprintw((int)trees.size() + 12, BORDER_RIGHT - 6, std::to_string(sawmillManager->getOrderSum()).c_str());
+    mvprintw((int)trees.size() + 12, VERTICAL_SPLIT + 2, progressBar(sawmillManager->getOrderProgress(), 10).c_str());
     //
     // SAWMILLS
     //
     attron(COLOR_PAIR(1));
     mvprintw((int)trees.size()+4, 10, "SAWMILLS");
     attroff(COLOR_PAIR(1));
-    for(int i = 0; i < (int)sawmills.size(); i++) {
-      mvprintw((int)trees.size()+5+i, 5, (sawmills[i]->getBoardTypeStr()).c_str());
-      mvprintw((int)trees.size()+5+i, 13, sawmills[i]->getStateStr().c_str());
-      mvprintw((int)trees.size()+5+i, 22, sawmills[i]->getSpeedStateStr().c_str());
+    for(int i = 0; i < 3; i++) {
+      mvprintw((int)trees.size()+5+i, 5, (sawmillManager->getSawmillBoardTypeStr(i)).c_str());
+      mvprintw((int)trees.size()+5+i, 13, sawmillManager->getSawmillStateStr(i).c_str());
+      mvprintw((int)trees.size()+5+i, 22, sawmillManager->getSawmillSpeedStateStr(i).c_str());
       attron(COLOR_PAIR(2));
-      mvprintw((int)trees.size()+5+i, 31, progressBar(sawmills[i]->getProgress(), 30).c_str());
-      mvprintw((int)trees.size()+5+i, 62, (std::to_string((int)sawmills[i]->getProgress())).c_str());
+      mvprintw((int)trees.size()+5+i, 31, progressBar(sawmillManager->getSawmillProgress(i), 30).c_str());
+      mvprintw((int)trees.size()+5+i, 62, (std::to_string((int)sawmillManager->getSawmillProgress(i))).c_str());
       mvprintw((int)trees.size()+5+i, 64, " / 100");
       attroff(COLOR_PAIR(2));
     }
