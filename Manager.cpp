@@ -18,14 +18,10 @@ Manager::Manager()
   {
     trees.push_back(new Tree(i, nature, resources));
   }
-
   for (int i = 0; i < LUMBERJACKS; i++)
   {
     lumberjacks.push_back(new Lumberjack(i, trees));
   }
-  // for (int i = 0; i< SAWMILLS; i++) {
-  //   sawmills.push_back(new Sawmill(resources, (BoardType)i));
-  // }
 }
 
 void Manager::setRunning(bool running)
@@ -37,7 +33,6 @@ bool Manager::getRunning()
 {
   return running;
 }
-
 
 const std::vector<Tree *> Manager::getTrees()
 {
@@ -56,14 +51,6 @@ Nature * Manager::getNature() {
 Resources * Manager::getResources() {
   return resources;
 }
-
-Sawmill * Manager::getSawmill() {
-  return sawmill;
-}
-
-// std::vector<Sawmill *> Manager::getSawmills() {
-//   return sawmills;
-// }
 
 Transport * Manager::getTransport() {
   return transport;

@@ -24,7 +24,6 @@ public:
   void setRunning(bool running);
   Nature* getNature();
   Resources* getResources();
-  Sawmill* getSawmill();
   SawmillManager * getSawmillManager();
   Transport * getTransport();
 private:
@@ -32,7 +31,6 @@ private:
   std::vector<Lumberjack *> lumberjacks;
   Nature * nature;
   Resources * resources;
-  Sawmill * sawmill;
   Transport * transport;
   SawmillManager * sawmillManager;
   bool running = true;

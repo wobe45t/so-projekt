@@ -24,7 +24,6 @@ public:
   int getOrderedLongBoards();
   void generateOrder();
   float getProgress();
-  std::vector<int> getOrder();
   BoardType getTopBoardPriority();
 private:
   TransportState transportState {TransportState::FROM_SHOP};
@@ -43,5 +42,4 @@ private:
   std::thread td;
   std::condition_variable cv;
   std::mutex mtx;
-
 };

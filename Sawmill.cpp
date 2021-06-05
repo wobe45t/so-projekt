@@ -8,9 +8,8 @@ Sawmill::Sawmill(Resources *resources, BoardType boardType) : resources(resource
 }
 // NOTE it works for now (04 14.06)
 void Sawmill::cycle() {
-  workRequested = true;
   int random_delay;
-  int sleep_time; // depending on SawmillSpeedState
+  int sleep_time;
   while(running){
     state = SawmillState::WAIT;
     progress = 0.0f;
@@ -79,13 +78,6 @@ std::string Sawmill::getStateStr() {
     return "UNKNOWN";
   }
 }
-std::string Sawmill::getWorkRequestStr() {
-  if(workRequested == true) {
-    return "REQUESTED";
-  } else {
-    return "";
-  }
-}
 SawmillState Sawmill::getState()  {
   return state;
 }
@@ -103,19 +95,4 @@ void Sawmill::setRunning(bool running){
 
 float Sawmill::getProgress() {
   return progress;
-}
-void Sawmill::setWork(bool work) {
-  std::lock_guard<std::mutex> lock(mtx);
-  // workRequested = work;
-}
-// FIXME not used
-bool Sawmill::requestBoard() { 
-  workRequested = true;
-  // std::unique_lock<std::mutex> ul(mtx);
-  // cv.wait(ul, [&] {return !workRequested ? true : false;});
-  return true;
-}
-
-bool Sawmill::getWorkRequested() {
-  return workRequested;
 }

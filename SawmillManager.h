@@ -12,9 +12,7 @@ public:
   SawmillManager(Resources* resources);
   void cycle();
   void setRunning(bool running);
-  void getResources(int shortBoard, int normalBoard, int longBoard);
   bool getBoards();
-  int requestBoard(BoardType boardType);
   int getLongBoards();
   int getShortBoards();
   int getNormalBoards();

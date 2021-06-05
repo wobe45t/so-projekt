@@ -20,20 +20,15 @@ public:
   void setRunning(bool running);
   std::string getStateStr();
   float getProgress();
-  int wait_counter = 0;
-  bool requestBoard();
   SawmillState getState();
   void setPriority(bool priority);
   bool getPriority();
-  bool getWorkRequested();
-  void setWork(bool work);
   void setSpeedState(SawmillSpeedState speedState);
   std::string getSpeedStateStr();
 private:
   BoardType boardType;
   std::atomic<SawmillState> state {SawmillState::WAIT};
   SawmillSpeedState speedState = {SawmillSpeedState::NO_ORDER};
-  std::atomic<bool> workRequested {false};
   float progress = 0.0f;
   Resources * resources;
   bool running = true;

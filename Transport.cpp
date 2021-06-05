@@ -10,7 +10,6 @@ Transport::Transport(SawmillManager * sawmillManager, Resources * resources) : r
 
 void Transport::cycle() {
   int orderSum = 0;
-  BoardType receivedBoard;
   while(running) {
     if(transportState == TransportState::WAITING) {
       if(orderReady == false) {
@@ -43,37 +42,6 @@ void Transport::cycle() {
     progress=0.0f;
   }
 }
-// BoardType Transport::getTopBoardPriority() {
-//   BoardType priorityBoard;
-
-//   if(orderedLongBoards >= orderedNormalBoards) {
-//     if(longBoards>0) {
-//       priorityBoard = (BoardType)2;
-//     } else if(normalBoards > 0) {
-//       priorityBoard = (BoardType)1;
-//     } else if (shortBoards > 0) {
-//       priorityBoard = (BoardType)0;
-//     }
-//   } else if (orderedNormalBoards >= orderedShortBoards){ // no need for long boards atm
-//     if(normalBoards>0) {
-//       priorityBoard = (BoardType)1;
-//     } else if(shortBoards > 0) {
-//       priorityBoard = (BoardType)0;
-//     } else if (longBoards > 0) {
-//       priorityBoard = (BoardType)2;
-//     }
-//   } else { // no need for long or normal atm
-//     if(shortBoards>0) {
-//       priorityBoard = (BoardType)0;
-//     } else if(normalBoards > 0) {
-//       priorityBoard = (BoardType)1;
-//     } else if (longBoards > 0) {
-//       priorityBoard = (BoardType)2;
-//     }
-//   }
-//   // FIXME dodac tutaj else statement ze stanem NO-PRIORITY~ zeby pokazac to w UI
-//   return priorityBoard;
-// }
 
 int Transport::getShortBoards() {
   return shortBoards;
@@ -98,12 +66,12 @@ int Transport::getOrderedNormalBoards(){
 int Transport::getOrderedLongBoards() {
   return orderedLongBoards;
 }
-std::vector<int> Transport::getOrder() {
-  std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return orderReady ? true : false;});
-  std::vector<int> order = {orderedShortBoards, orderedNormalBoards, orderedLongBoards};
-  return order;
-}
+// std::vector<int> Transport::getOrder() {
+//   std::unique_lock<std::mutex> ul(mtx);
+//   cv.wait(ul, [&] {return orderReady ? true : false;});
+//   std::vector<int> order = {orderedShortBoards, orderedNormalBoards, orderedLongBoards};
+//   return order;
+// }
 
 std::string Transport::getStateStr() {
   switch(transportState) {

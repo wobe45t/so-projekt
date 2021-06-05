@@ -15,7 +15,6 @@ public:
   void requestBoards(int shortBoards, int normalBoards, int longBoards);
   int requestBoard(int boards, BoardType boardType);
   void addBoard(int boards, BoardType boardType);
-  void addNormalBoard();
   int getWood();
   int getLongBoards();
   int getShortBoards();

@@ -17,10 +17,6 @@ void Resources::requestWood(int requestedWood) {
   this->wood -= requestedWood;
 }
 
-void Resources::addNormalBoard() {
-  normalBoard++;
-  cv.notify_one();
-}
 BoardType Resources::requestAnyBoard(bool shortBoardsNeeded, bool normalBoardsNeeded, bool longBoardsNeeded) {
   // moge tutaj zapisac stany poprzednich desek i sprawdzac wszystko w tym jednym cv.wait i przypisac po prostu typ deski ktory dostalo ?
   int previousShortBoards = shortBoard;
