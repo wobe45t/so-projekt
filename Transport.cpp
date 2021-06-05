@@ -105,7 +105,7 @@ std::vector<int> Transport::getOrder() {
   return order;
 }
 
-std::string Transport::getState() {
+std::string Transport::getStateStr() {
   switch(transportState) {
     case TransportState::WAITING:
     return "WAITING";
@@ -117,7 +117,9 @@ std::string Transport::getState() {
     return "UNKNOWN";
   }
 }
-
+TransportState Transport::getState() {
+  return transportState;
+}
 void Transport::generateOrder() {
   orderedLongBoards = rand() % RAND_RANGE + 1;
   orderedNormalBoards = rand() % RAND_RANGE + 1;

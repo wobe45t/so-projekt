@@ -84,6 +84,10 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
   orderedLongBoards = longBoards;
   shortBoardsNeeded = normalBoardsNeeded = longBoardsNeeded = true;
   // here i could ask for all possible resources needed (produced when transport was being delivered)
+  preparedShortBoards += resources->requestShortBoard(shortBoards);
+  preparedNormalBoards += resources->requestNormalBoard(normalBoards);
+  preparedLongBoards += resources->requestLongBoard(longBoards);
+
   orderRdy = true;
   std::unique_lock<std::mutex> ul(mtx);
   // ? possible issue with >= signs in the return statement
@@ -105,6 +109,9 @@ int SawmillManager::getOrderProgress() {
 }
 int SawmillManager::getOrderSum() {
   return orderedShortBoards + orderedNormalBoards + orderedLongBoards;
+}
+int SawmillManager::getPreparedSum() {
+  return preparedShortBoards + preparedNormalBoards + preparedLongBoards;
 }
 //  NOTE with mutexes it doent work - stuck
 std::string SawmillManager::getSawmillBoardTypeStr(int index) {

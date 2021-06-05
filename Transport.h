@@ -13,7 +13,8 @@ class Transport {
 public:
   Transport(SawmillManager * sawmillManager, Resources * resources);
   void cycle();
-  std::string getState();
+  std::string getStateStr();
+  TransportState getState();
   int getTransportCounter();
   int getShortBoards();
   int getNormalBoards();

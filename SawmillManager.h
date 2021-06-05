@@ -34,6 +34,7 @@ public:
   std::string getSawmillBoardTypeStr(int index);
   int getOrderProgress();
   int getOrderSum();
+  int getPreparedSum();
   void getPreparedOrder(int shortBoards, int normalBoards, int longBoards);
   std::string getMessage();
 private:

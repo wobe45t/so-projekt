@@ -129,24 +129,61 @@ void Resources::requestBoards(int requestedShortBoards, int requestedNormalBoard
 
 int Resources::requestShortBoard(int requestedBoards) {
   std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return (shortBoard >= requestedBoards) ? true : false;});
-  shortBoard -= requestedBoards;
-  return requestedBoards;
+  int result = 0;
+  cv.wait(ul, [&] {
+    if(requestedBoards >= shortBoard) {
+      result = shortBoard;
+      shortBoard = 0;
+      return true;
+    }
+    else {
+      result = requestedBoards;
+      shortBoard -= requestedBoards;
+      return true;
+    }
+    return false;
+  });
+  return result;
 }
-
-
 int Resources::requestNormalBoard(int requestedBoards) {
   std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return (normalBoard >= requestedBoards) ? true : false;});
-  normalBoard -= requestedBoards;
-  return requestedBoards;
+  int result = 0;
+  cv.wait(ul, [&] {
+    if(requestedBoards >= normalBoard) {
+      result = normalBoard;
+      normalBoard = 0;
+      return true;
+    }
+    else {
+      result = requestedBoards;
+      normalBoard -= requestedBoards;
+      return true;
+    }
+    return false;
+  });
+  return result;
 }
+
 int Resources::requestLongBoard(int requestedBoards) {
   std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return (longBoard >= requestedBoards) ? true : false;});
-  longBoard -= requestedBoards;
-  return requestedBoards;
+  int result = 0;
+  cv.wait(ul, [&] {
+    if(requestedBoards >= longBoard) {
+      result = longBoard;
+      longBoard = 0;
+      return true;
+    }
+    else {
+      result = requestedBoards;
+      longBoard -= requestedBoards;
+      return true;
+    }
+    return false;
+  });
+  return result;
 }
+
+
 int Resources::getWood() {
   return wood;
 }
