@@ -88,6 +88,7 @@ std::string Transport::getStateStr() {
 TransportState Transport::getState() {
   return transportState;
 }
+
 void Transport::generateOrder() {
   orderedLongBoards = rand() % RAND_RANGE + 1;
   orderedNormalBoards = rand() % RAND_RANGE + 1;

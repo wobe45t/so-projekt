@@ -14,49 +14,49 @@ SawmillManager::SawmillManager(Resources *resources): td(&SawmillManager::cycle,
 
 void SawmillManager::cycle()
 {
+  BoardType receivedBoard;
   while (running)
   {
-    message = "Waiting for order";
-    // BoardType priorityBoard;
-    BoardType receivedBoard;
-    // int priorityChangeTime = 100000;
-    // int priorityChangeProgress = 0;
-
-    while(orderRdy) {
-      // check if all boards are prepared - if so break the loop
-      if(preparedShortBoards == orderedShortBoards) {
-        std::lock_guard<std::mutex> lock(mtx);
+    // message = "WAITING FOR ORDER";
+    // NOTE this usleep fixed issue with race condition
+    usleep(100);
+    if(orderRdy) {
+      // NOTE THIS CHECK THROWS AN ERROR
+      // if(orderedLongBoards == preparedLongBoards && preparedLongBoards != 0 && orderedNormalBoards == preparedNormalBoards && preparedNormalBoards != 0 && orderedShortBoards == preparedShortBoards && preparedShortBoards != 0) {
+      //   throw std::logic_error("prepared " + std::to_string(preparedLongBoards) + " ordered " + std::to_string(orderedLongBoards));
+      // }
+      if(preparedShortBoards >= orderedShortBoards) {
         shortBoardsNeeded = false;
         sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
-        std::lock_guard<std::mutex> lock(mtx);
         shortBoardsNeeded = true;
         sawmills[0]->setSpeedState(SawmillSpeedState::ORDER);
       }
-      if(preparedNormalBoards == orderedNormalBoards) {
-        std::lock_guard<std::mutex> lock(mtx);
+      if(preparedNormalBoards >= orderedNormalBoards) {
         normalBoardsNeeded = false;
         sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
-        std::lock_guard<std::mutex> lock(mtx);
         normalBoardsNeeded = true;
         sawmills[1]->setSpeedState(SawmillSpeedState::ORDER);
       }
-      if(preparedLongBoards == orderedLongBoards) {
-        std::lock_guard<std::mutex> lock(mtx);
+      if(preparedLongBoards >= orderedLongBoards) {
+        message = "";
         longBoardsNeeded = false;
         sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
       else {
-        std::lock_guard<std::mutex> lock(mtx);
         longBoardsNeeded = true;
         sawmills[2]->setSpeedState(SawmillSpeedState::ORDER);
       }
-      // request single board -> when returned increment counter of given type and check if boards are still needed
-      message = std::string(shortBoardsNeeded ? "TRUE" : "FALSE") + " " + std::string(normalBoardsNeeded ? "TRUE" : "FALSE") + " " +std::string(longBoardsNeeded ? "TRUE" : "FALSE");
+      // NOTE check if ordered board are not 0
+      message = std::to_string(preparedShortBoards) + "/" + std::to_string(orderedShortBoards) + " " +
+ std::to_string(preparedNormalBoards) + "/" + std::to_string(orderedNormalBoards) + " " + std::to_string(preparedLongBoards) + "/" + std::to_string(orderedLongBoards);
+      // to robic po checku czy ktoras z tych w ogole jest true
       receivedBoard = resources->requestAnyBoard(shortBoardsNeeded, normalBoardsNeeded, longBoardsNeeded);
+      // FIXME remove from .h/.coo
+      counter++;
       if(receivedBoard == BoardType::SHORT) {
         preparedShortBoards ++;
       }
@@ -73,32 +73,57 @@ void SawmillManager::cycle()
     }
   }
 }
-// ta funckja mogla by sie nazywac orderBoards(short, normal, long)
-// i mogla by jako pierwsze ustawiac zmienne managera ordered na te ilosci
-// a potem ustawiac stan na ORDER_PLACED zeby uruchomic while loopa. Tam bedzie sie dzialo to wszystko.
-// na koncu tej funckji po wait na cv bylo by zmienienie stanu run na na ORDER_WAIT i tylko monza by to wypisac na ekranie
-// i czkeac w while na ustawienie poparwnego stanu spowrotem
-void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int longBoards) {
-  orderedShortBoards = shortBoards;
-  orderedNormalBoards = normalBoards;
-  orderedLongBoards = longBoards;
-  shortBoardsNeeded = normalBoardsNeeded = longBoardsNeeded = true;
-  // here i could ask for all possible resources needed (produced when transport was being delivered)
-  preparedShortBoards += resources->requestShortBoard(shortBoards);
-  preparedNormalBoards += resources->requestNormalBoard(normalBoards);
-  preparedLongBoards += resources->requestLongBoard(longBoards);
+std::string SawmillManager::getCounterStr() {
+  return std::to_string(counter);
+}
 
+void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int longBoards) {
+  // FIXME this-> is redundant
+  this->orderedShortBoards = shortBoards;
+  this->orderedNormalBoards = normalBoards;
+  this->orderedLongBoards = longBoards;
+  // get all possible boards from the resources
+  this->preparedShortBoards = resources->requestShortBoard(shortBoards);
+  this->preparedNormalBoards = resources->requestNormalBoard(normalBoards);
+  this->preparedLongBoards = resources->requestLongBoard(longBoards);
+  //FIXME fresh is redundant
+  fresh = true;
   orderRdy = true;
   std::unique_lock<std::mutex> ul(mtx);
-  // ? possible issue with >= signs in the return statement
+  // NOTE possible issue with >= signs in the return statement
   cv.wait(ul, [&] {
-    return (preparedShortBoards >= shortBoards && preparedNormalBoards >= normalBoards && preparedLongBoards >= longBoards) ? true : false;
+    if(preparedShortBoards >= shortBoards && preparedNormalBoards >= normalBoards && preparedLongBoards >= longBoards) {
+      orderRdy = false;
+      sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
+      sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
+      sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
+      shortBoardsNeeded = false;
+      normalBoardsNeeded = false;
+      longBoardsNeeded = false;
+      resetOrder();
+      counter = 0;
+      return true;
+    }
+    return false;
   });
-  shortBoardsNeeded = normalBoardsNeeded = longBoardsNeeded = true;
-  preparedShortBoards = preparedNormalBoards = preparedLongBoards = 0;
-  orderedShortBoards = orderedNormalBoards = orderedLongBoards = 0;
-  orderRdy = false;
 }
+void SawmillManager::resetOrder() {
+  preparedShortBoards = 0;
+  preparedNormalBoards = 0;
+  preparedLongBoards = 0;
+  orderedShortBoards = 0;
+  orderedNormalBoards = 0;
+  orderedLongBoards = 0;
+}
+std::string SawmillManager::getOrderRdyStr() {
+  if(orderRdy) {
+    return "TRUE";
+  }
+  else {
+    return "FALSE";
+  }
+}
+
 int SawmillManager::getOrderProgress() {
   int preparedSum = preparedShortBoards + preparedNormalBoards + preparedLongBoards;
   int orderedSum = orderedShortBoards + orderedNormalBoards + orderedLongBoards;
@@ -107,50 +132,66 @@ int SawmillManager::getOrderProgress() {
   }
   return (int)((preparedSum/(float)orderedSum)*100);
 }
+
 int SawmillManager::getOrderSum() {
   return orderedShortBoards + orderedNormalBoards + orderedLongBoards;
 }
+
 int SawmillManager::getPreparedSum() {
   return preparedShortBoards + preparedNormalBoards + preparedLongBoards;
 }
+// NOTE  THIS FUNCTIONS DIDNT HELP
+// FIXME remove those functions from .cpp/.h
+void SawmillManager::setPreparedLongBoards(int preparedLongBoards) {
+  mtx2.lock();
+  this->preparedLongBoards = preparedLongBoards;
+  mtx2.unlock();
+}
+void SawmillManager::setPreparedNormalBoards(int preparedNormalBoards) {
+  mtx2.lock();
+  this->preparedNormalBoards = preparedNormalBoards;
+  mtx2.unlock();
+}
+void SawmillManager::setPreparedShortBoards(int preparedShortBoards) {
+  mtx2.lock();
+  this->preparedShortBoards = preparedShortBoards;
+  mtx2.unlock();
+}
+void SawmillManager::setOrderedLongBoards(int orderedLongBoards) {
+  mtx2.lock();
+  this->orderedLongBoards = orderedLongBoards;
+  mtx2.unlock();
+}
+void SawmillManager::setOrderedNormalBoards(int orderedNormalBoards) {
+  mtx2.lock();
+  this->orderedNormalBoards = orderedNormalBoards;
+  mtx2.unlock();
+}
+void SawmillManager::setOrderedShortBoards(int orderedShortBoards) {
+  mtx2.lock();
+  this->orderedShortBoards = orderedShortBoards;
+  mtx2.unlock();
+}
+
 //  NOTE with mutexes it doent work - stuck
 std::string SawmillManager::getSawmillBoardTypeStr(int index) {
-  // mtx2.lock();
   return sawmills[index]->getBoardTypeStr();
-  // mtx2.unlock();
 }
+
 int SawmillManager::getSawmillProgress(int index) {
-  // mtx2.lock();
   return sawmills[index]->getProgress();
-  // mtx2.unlock();
 }
+
 std::string SawmillManager::getSawmillSpeedStateStr(int index) {
-  // mtx2.lock();
   return sawmills[index]->getSpeedStateStr();
-  // mtx2.unlock();
 }
+
 std::string SawmillManager::getSawmillStateStr(int index) {
-  // mtx2.lock();
   return sawmills[index]->getStateStr();
-  // mtx2.unlock();
 }
+
 std::string SawmillManager::getMessage() {
   return message;
-}
-
-int SawmillManager::getLongBoards()
-{
-  return longBoards;
-}
-
-int SawmillManager::getShortBoards()
-{
-  return shortBoards;
-}
-
-int SawmillManager::getNormalBoards()
-{
-  return normalBoards;
 }
 
 int SawmillManager::getPreparedLongBoards()
@@ -191,7 +232,6 @@ bool SawmillManager::getLongBoardsNeeded()
 bool SawmillManager::getShortBoardsNeeded()
 {
   return shortBoardsNeeded;
-
 }
 
 bool SawmillManager::getNormalBoardsNeeded()

@@ -13,9 +13,6 @@ public:
   void cycle();
   void setRunning(bool running);
   bool getBoards();
-  int getLongBoards();
-  int getShortBoards();
-  int getNormalBoards();
   int getPreparedLongBoards();
   int getPreparedShortBoards();
   int getPreparedNormalBoards();
@@ -26,6 +23,13 @@ public:
   bool getShortBoardsNeeded();
   bool getNormalBoardsNeeded();
 
+  void setPreparedLongBoards(int preparedLongBoards);
+  void setPreparedShortBoards(int preparedShortBoards);
+  void setPreparedNormalBoards(int preparedNormalBoards);
+  void setOrderedLongBoards(int orderedLongBoards);
+  void setOrderedShortBoards(int orderedShortBoards);
+  void setOrderedNormalBoards(int orderedNormalBoards);
+
   int getSawmillProgress(int index);
   std::string getSawmillSpeedStateStr(int index);
   std::string getSawmillStateStr(int index);
@@ -33,16 +37,19 @@ public:
   int getOrderProgress();
   int getOrderSum();
   int getPreparedSum();
+  std::string getCounterStr();
+  std::string getOrderRdyStr();
   void getPreparedOrder(int shortBoards, int normalBoards, int longBoards);
+  // void setOrderBoards(int shortBoards, int normalBoards, int longBoards);
+  void resetOrder();
   std::string getMessage();
 private:
+  std::atomic<bool> fresh = {false};
   std::thread td;
   std::mutex mtx;
   std::mutex mtx2;
-  bool orderRdy = {false};
-  std::atomic<int> longBoards {0};
-  std::atomic<int> normalBoards {0};
-  std::atomic<int> shortBoards {0};
+  std::atomic<int> counter {0};
+  std::atomic<bool> orderRdy {false};
   std::atomic<int> preparedLongBoards {0};
   std::atomic<int> preparedNormalBoards {0};
   std::atomic<int> preparedShortBoards {0};

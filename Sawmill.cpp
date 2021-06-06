@@ -18,7 +18,7 @@ void Sawmill::cycle() {
     while(progress<=100.0f) {
     state = SawmillState::WORK;
       progress+=1;
-      mtx.lock();
+      // mtx.lock();
       if(speedState == SawmillSpeedState::NO_ORDER) {
         sleep_time = 200000;
       }
@@ -28,7 +28,7 @@ void Sawmill::cycle() {
       else {
         sleep_time = 60000;
       }
-      mtx.unlock();
+      // mtx.unlock();
       usleep(sleep_time + random_delay);
     }
     resources->addBoard(1, boardType);

@@ -145,6 +145,9 @@ void UI::update()
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 23, " / ");
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedShortBoards()).c_str());
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 29, std::string(sawmillManager->getShortBoardsNeeded() ? "T": "F").c_str());
+
+    mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 5, ("ORDER_RDY " + sawmillManager->getOrderRdyStr()).c_str());
+    mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 20, sawmillManager->getCounterStr().c_str());
     //
     // SAWMILLS
     //
