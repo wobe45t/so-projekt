@@ -6,7 +6,6 @@ Sawmill::Sawmill(Resources *resources) : resources(resources)
 Sawmill::Sawmill(Resources *resources, BoardType boardType) : resources(resources), boardType(boardType), td(&Sawmill::cycle, this)
 {
 }
-// NOTE it works for now (04 14.06)
 void Sawmill::cycle() {
   int random_delay;
   int sleep_time;
@@ -26,11 +25,12 @@ void Sawmill::cycle() {
         sleep_time = 100000;
       }
       else {
-        sleep_time = 60000;
+        sleep_time = 50000;
       }
       // mtx.unlock();
       usleep(sleep_time + random_delay);
     }
+    //  FIXME no need for first parameter in this function
     resources->addBoard(1, boardType);
   }
 }

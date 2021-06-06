@@ -30,8 +30,10 @@ private:
   Resources * resources;
   SawmillManager * sawmillManager;
   float progress = 0.0f;
-  int transportCounter = 0;
+  std::atomic<int> transportCounter {0};
+  // NOTE shouldnt running be atomic ? it is accessed from the main
   bool running = true;
+
   std::atomic<int> orderedShortBoards {0};
   std::atomic<int> orderedNormalBoards {0};
   std::atomic<int> orderedLongBoards {0};

@@ -1,7 +1,7 @@
 #include "Transport.h"
 #include <unistd.h>
 
-#define RAND_RANGE 5
+#define RAND_RANGE 10
 
 Transport::Transport(SawmillManager * sawmillManager, Resources * resources) : resources(resources), sawmillManager(sawmillManager), td(&Transport::cycle, this)
 {
@@ -66,12 +66,6 @@ int Transport::getOrderedNormalBoards(){
 int Transport::getOrderedLongBoards() {
   return orderedLongBoards;
 }
-// std::vector<int> Transport::getOrder() {
-//   std::unique_lock<std::mutex> ul(mtx);
-//   cv.wait(ul, [&] {return orderReady ? true : false;});
-//   std::vector<int> order = {orderedShortBoards, orderedNormalBoards, orderedLongBoards};
-//   return order;
-// }
 
 std::string Transport::getStateStr() {
   switch(transportState) {

@@ -147,7 +147,7 @@ void UI::update()
     mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 29, std::string(sawmillManager->getShortBoardsNeeded() ? "T": "F").c_str());
 
     mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 5, ("ORDER_RDY " + sawmillManager->getOrderRdyStr()).c_str());
-    mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 20, sawmillManager->getCounterStr().c_str());
+    // mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 20, sawmillManager->getCounterStr().c_str());
     //
     // SAWMILLS
     //
@@ -238,7 +238,7 @@ void UI::init()
       break;
     }
   }
-
+  //FIXME here function in manager should call every other item or it should be called individually from here
   manager->setRunning(false);
   refreshThread.join();
   endwin();

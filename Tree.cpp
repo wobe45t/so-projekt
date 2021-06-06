@@ -37,7 +37,7 @@ bool Tree::cut() {
     cutProgress = 0;
     growth = 0;
     cutSize = 1.0f;
-    resources->addWood(8);
+    resources->addWood(2);
     state = TreeState::GROWING;
     return false;
   }

@@ -23,13 +23,6 @@ public:
   bool getShortBoardsNeeded();
   bool getNormalBoardsNeeded();
 
-  void setPreparedLongBoards(int preparedLongBoards);
-  void setPreparedShortBoards(int preparedShortBoards);
-  void setPreparedNormalBoards(int preparedNormalBoards);
-  void setOrderedLongBoards(int orderedLongBoards);
-  void setOrderedShortBoards(int orderedShortBoards);
-  void setOrderedNormalBoards(int orderedNormalBoards);
-
   int getSawmillProgress(int index);
   std::string getSawmillSpeedStateStr(int index);
   std::string getSawmillStateStr(int index);
@@ -37,18 +30,15 @@ public:
   int getOrderProgress();
   int getOrderSum();
   int getPreparedSum();
-  std::string getCounterStr();
   std::string getOrderRdyStr();
   void getPreparedOrder(int shortBoards, int normalBoards, int longBoards);
-  // void setOrderBoards(int shortBoards, int normalBoards, int longBoards);
-  void resetOrder();
+  void choosePrioritySawmill();
   std::string getMessage();
 private:
   std::atomic<bool> fresh = {false};
   std::thread td;
   std::mutex mtx;
   std::mutex mtx2;
-  std::atomic<int> counter {0};
   std::atomic<bool> orderRdy {false};
   std::atomic<int> preparedLongBoards {0};
   std::atomic<int> preparedNormalBoards {0};
