@@ -76,19 +76,19 @@ void SawmillManager::choosePrioritySawmill() {
   // NOTE tutaj mozna by bylo dodac zmienne counter oraz previous prio board
   // i sprawdzac czy counter przynajmniej odbyl sie 2 razy albo juz nie potrzeba konkretnych desek(wtedy counter moze byc 1)
   // naprawilo by to problem ze skakaniem pomiedzy boardami co zmiane o 1 boarda w niektorych konfiguracjach orderu
-  if(longBoardDiff > normalBoardDiff) {
-    if(normalBoardDiff > shortBoardDiff && normalBoardsNeeded) {
+  if(longBoardDiff >= normalBoardDiff) {
+    if(normalBoardDiff >= shortBoardDiff && normalBoardsNeeded) {
       sawmills[2]->setSpeedState(SawmillSpeedState::PRIORITY);
     }
-    else if(shortBoardDiff > normalBoardDiff && shortBoardsNeeded){
+    else if(shortBoardDiff >= normalBoardDiff && shortBoardsNeeded){
       sawmills[0]->setSpeedState(SawmillSpeedState::PRIORITY);
     }
   }
-  else if(normalBoardDiff > longBoardDiff){
-    if(normalBoardDiff > shortBoardDiff && normalBoardsNeeded) {
+  else if(normalBoardDiff >= longBoardDiff){
+    if(normalBoardDiff >= shortBoardDiff && normalBoardsNeeded) {
       sawmills[1]->setSpeedState(SawmillSpeedState::PRIORITY);
     }
-    else if(shortBoardDiff > normalBoardDiff && shortBoardsNeeded){
+    else if(shortBoardDiff >= normalBoardDiff && shortBoardsNeeded){
       sawmills[0]->setSpeedState(SawmillSpeedState::PRIORITY);
     }
   }
@@ -126,13 +126,8 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
     return false;
   });
 }
-std::string SawmillManager::getOrderRdyStr() {
-  if(orderRdy) {
-    return "TRUE";
-  }
-  else {
-    return "FALSE";
-  }
+bool SawmillManager::getOrderRdy() {
+  return orderRdy;
 }
 
 int SawmillManager::getOrderProgress() {

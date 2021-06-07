@@ -23,7 +23,7 @@ Manager::Manager()
     lumberjacks.push_back(new Lumberjack(i, trees));
   }
 }
-
+//FIXME change this function to exit or something and close all the child threads
 void Manager::setRunning(bool running)
 {
   this->running = running;

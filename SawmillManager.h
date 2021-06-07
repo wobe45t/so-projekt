@@ -30,7 +30,7 @@ public:
   int getOrderProgress();
   int getOrderSum();
   int getPreparedSum();
-  std::string getOrderRdyStr();
+  bool getOrderRdy();
   void getPreparedOrder(int shortBoards, int normalBoards, int longBoards);
   void choosePrioritySawmill();
   std::string getMessage();

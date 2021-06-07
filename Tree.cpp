@@ -24,6 +24,7 @@ void Tree::cycle() {
       } 
       usleep(100000 + rand() % 100000);
     }
+    //NOTE add DEAD state and sleep after cut
     // usleep(500000);
   }
 }
@@ -37,7 +38,7 @@ bool Tree::cut() {
     cutProgress = 0;
     growth = 0;
     cutSize = 1.0f;
-    resources->addWood(2);
+    resources->addWood(4);
     state = TreeState::GROWING;
     return false;
   }

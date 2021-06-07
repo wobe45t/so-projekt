@@ -1,6 +1,6 @@
 #include "UI.h"
 #define SAWMILLS 3
-#define BORDER_RIGHT 104
+#define BORDER_RIGHT 110
 #define VERTICAL_SPLIT 72
 #define HORIZONTAL_SPLIT (int)trees.size() + 3
 #define BORDER_BOTTOM (int)trees.size() + 16
@@ -11,7 +11,6 @@ UI::UI(Manager *manager) : manager(manager)
   lumberjacks = manager->getLumberjacks();
   nature = manager->getNature();
   resources = manager->getResources();
-  // sawmills = manager->getSawmills();
   transport = manager->getTransport();
   sawmillManager = manager->getSawmillManager();
 }
@@ -20,7 +19,6 @@ UI::~UI()
 {
   endwin();
 }
-//hello test.
 void UI::update()
 {
   while (manager->getRunning())
@@ -36,6 +34,8 @@ void UI::update()
     mvprintw(2, 22, "LUMBER");
     mvprintw(2, 40, "PROGRESS");
     attroff(COLOR_PAIR(4));
+
+    // mvprintw(2, BORDER_RIGHT + 2, std::to_string(resources->getWood()).c_str());
     for (int i = 0; i < (int)trees.size(); i++)
     {
       std::stringstream stream;
@@ -61,8 +61,14 @@ void UI::update()
       }
       mvprintw(i + 3, 2, std::to_string(trees[i]->getId()).c_str());
       mvprintw(i + 3, 12, trees[i]->getState().c_str());
-      mvprintw(i + 3, 31, progressBar(progressBarValue, 30).c_str());
+      mvprintw(i + 3, 30, progressBar(progressBarValue, 30).c_str());
       mvprintw(i + 3, 62, (std::to_string((int)progressBarValue)).c_str());
+      if((int)progressBarValue == 100) {
+        mvprintw(i + 3, 61, "100");
+      }
+      else {
+        mvprintw(i + 3, 62, (std::to_string((int)progressBarValue)).c_str());
+      }
       mvprintw(i + 3, 64, " / 100");
       if (trees[i]->state == TreeState::CUTTING)
       {
@@ -94,7 +100,9 @@ void UI::update()
     for(int i=0; i<BORDER_RIGHT; i++) {
       mvprintw(HORIZONTAL_SPLIT, i, "=");
     }
-    //! PRINTING LUMBERJACKS
+    //
+    //  LUMBERJACKS
+    //
     mvprintw(0, VERTICAL_SPLIT + 8, "LUMBERJACKS");
     attron(COLOR_PAIR(1));
     mvprintw(2, VERTICAL_SPLIT + 2, "ID");
@@ -113,85 +121,99 @@ void UI::update()
     //
     // RESOURCES
     //
-    mvprintw((int)trees.size()+ 4, VERTICAL_SPLIT + 2, "RESOURCES");
+    mvprintw(HORIZONTAL_SPLIT + 1, VERTICAL_SPLIT + 2, "RESOURCES");
     attron(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 6, VERTICAL_SPLIT + 2, "NAME");
-    mvprintw((int)trees.size() + 6, VERTICAL_SPLIT + 11, "QUANTITY");
+    mvprintw(HORIZONTAL_SPLIT + 2, VERTICAL_SPLIT + 2, "NAME");
+    mvprintw(HORIZONTAL_SPLIT + 2, VERTICAL_SPLIT + 11, "QUANTITY");
     attroff(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 7, VERTICAL_SPLIT + 2, "WOOD");
-    mvprintw((int)trees.size() + 7, VERTICAL_SPLIT + 14, std::to_string(resources->getWood()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 3, VERTICAL_SPLIT + 2, "WOOD");
+    mvprintw(HORIZONTAL_SPLIT + 3, VERTICAL_SPLIT + 14, std::to_string(resources->getWood()).c_str());
     attron(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 2, "BOARDS");
-    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 11, "STORAGE");
-    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 20, "GOT");
-    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 24, "/");
-    mvprintw((int)trees.size() + 8, VERTICAL_SPLIT + 26, "ORDER");
-    attroff(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 2, "-LONG");
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 14, std::to_string(resources->getLongBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedLongBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 23, " / ");
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedLongBoards()).c_str());
-    mvprintw((int)trees.size() + 11, VERTICAL_SPLIT + 29, std::string(sawmillManager->getLongBoardsNeeded() ? "T": "F").c_str());
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 2, "-NORMAL");
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 14, std::to_string(resources->getNormalBoards()).c_str());
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedNormalBoards()).c_str());
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 23, " / ");
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedNormalBoards()).c_str());
-    mvprintw((int)trees.size() + 10, VERTICAL_SPLIT + 29, std::string(sawmillManager->getNormalBoardsNeeded() ? "T": "F").c_str());
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 2, "-SHORT");
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedShortBoards()).c_str());
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 23, " / ");
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedShortBoards()).c_str());
-    mvprintw((int)trees.size() + 9, VERTICAL_SPLIT + 29, std::string(sawmillManager->getShortBoardsNeeded() ? "T": "F").c_str());
+    mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 2, "BOARDS");
+    if(sawmillManager->getOrderRdy()) {
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 11, "STORAGE");
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 20, "GOT");
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 24, "/");
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 26, "ORDER");
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 33, "NEED");
+    }
 
-    mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 5, ("ORDER_RDY " + sawmillManager->getOrderRdyStr()).c_str());
-    // mvprintw((int)trees.size() + 13, VERTICAL_SPLIT + 20, sawmillManager->getCounterStr().c_str());
+    attroff(COLOR_PAIR(1));
+    mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 2, "-LONG");
+    mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 14, std::to_string(resources->getLongBoards()).c_str());
+    if(sawmillManager->getOrderRdy()) {
+      mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedLongBoards()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 23, " / ");
+      mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedLongBoards()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 33, std::string(sawmillManager->getLongBoardsNeeded() ? "YES": "NO").c_str());
+    }
+    mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 2, "-NORMAL");
+    mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 14, std::to_string(resources->getNormalBoards()).c_str());
+    if(sawmillManager->getOrderRdy()) {
+      mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedNormalBoards()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 23, " / ");
+      mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedNormalBoards()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 33, std::string(sawmillManager->getNormalBoardsNeeded() ? "YES": "NO").c_str());
+    }
+    mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 2, "-SHORT");
+    mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
+    if(sawmillManager->getOrderRdy()) {
+      mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedShortBoards()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 23, " / ");
+      mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 26, std::to_string(sawmillManager->getOrderedShortBoards()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 33, std::string(sawmillManager->getShortBoardsNeeded() ? "YES": "NO").c_str());
+    }
+
     //
     // SAWMILLS
     //
+    mvprintw(HORIZONTAL_SPLIT+1, 6, "SAWMILLS");
     attron(COLOR_PAIR(1));
-    mvprintw((int)trees.size()+4, 10, "SAWMILLS");
-    mvprintw((int)trees.size()+5, 5, "BOARD");
-    mvprintw((int)trees.size()+5, 13, "STATE");
-    mvprintw((int)trees.size()+5, 22, "SPEED");
-    mvprintw((int)trees.size()+5, 40, "PROGRESS");
+    mvprintw(HORIZONTAL_SPLIT+2, 2, "BOARD");
+    mvprintw(HORIZONTAL_SPLIT+2, 10, "STATE");
+    mvprintw(HORIZONTAL_SPLIT+2, 19, "SPEED");
+    mvprintw(HORIZONTAL_SPLIT+2, 39, "PROGRESS");
     attroff(COLOR_PAIR(1));
     for(int i = 0; i < 3; i++) {
-      mvprintw((int)trees.size()+6+i, 5, (sawmillManager->getSawmillBoardTypeStr(i)).c_str());
-      mvprintw((int)trees.size()+6+i, 13, sawmillManager->getSawmillStateStr(i).c_str());
-      mvprintw((int)trees.size()+6+i, 22, sawmillManager->getSawmillSpeedStateStr(i).c_str());
+      mvprintw(HORIZONTAL_SPLIT+3+i, 2, (sawmillManager->getSawmillBoardTypeStr(i)).c_str());
+      mvprintw(HORIZONTAL_SPLIT+3+i, 10, sawmillManager->getSawmillStateStr(i).c_str());
+      mvprintw(HORIZONTAL_SPLIT+3+i, 19, sawmillManager->getSawmillSpeedStateStr(i).c_str());
       attron(COLOR_PAIR(2));
-      mvprintw((int)trees.size()+6+i, 31, progressBar(sawmillManager->getSawmillProgress(i), 30).c_str());
-      mvprintw((int)trees.size()+6+i, 62, (std::to_string((int)sawmillManager->getSawmillProgress(i))).c_str());
-      mvprintw((int)trees.size()+6+i, 64, " / 100");
+      mvprintw(HORIZONTAL_SPLIT+3+i, 30, progressBar(sawmillManager->getSawmillProgress(i), 30).c_str());
+      // FIXME imporve
+      if((int)sawmillManager->getSawmillProgress(i) == 100) {
+        mvprintw(HORIZONTAL_SPLIT+3+i, 61, "100");
+      }
+      else {
+        mvprintw(HORIZONTAL_SPLIT+3+i, 62, (std::to_string((int)sawmillManager->getSawmillProgress(i))).c_str());
+      }
+      mvprintw(HORIZONTAL_SPLIT+3+i, 64, " / 100");
       attroff(COLOR_PAIR(2));
     }
     //
     // TRANSPORT
     //
+    mvprintw(HORIZONTAL_SPLIT + 7, 6, "TRANSPORT");
     attron(COLOR_PAIR(1));
-    mvprintw(HORIZONTAL_SPLIT + 6, 10, "TRANSPORT");
+    mvprintw(HORIZONTAL_SPLIT + 8, 2, "COUNT");
+    mvprintw(HORIZONTAL_SPLIT + 8, 10, "STATE");
+    mvprintw(HORIZONTAL_SPLIT + 8, 39, "PROGRESS");
     attroff(COLOR_PAIR(1));
-    mvprintw(HORIZONTAL_SPLIT + 7, 5, "COUNTER");
-    mvprintw(HORIZONTAL_SPLIT + 7, 15, "STATE");
-    mvprintw(HORIZONTAL_SPLIT + 7, 40, "PROGRESS");
-    mvprintw(HORIZONTAL_SPLIT + 8, 5, std::to_string(transport->getTransportCounter()).c_str());
-    mvprintw(HORIZONTAL_SPLIT + 8, 15, transport->getStateStr().c_str());
+    mvprintw(HORIZONTAL_SPLIT + 9, 4, std::to_string(transport->getTransportCounter()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 9, 10, transport->getStateStr().c_str());
     if(transport->getState() == TransportState::WAITING) {
       attron(COLOR_PAIR(1));
-      mvprintw(HORIZONTAL_SPLIT + 8, 31, progressBar(sawmillManager->getOrderProgress(), 30).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 8, 62, (std::to_string((int)sawmillManager->getPreparedSum())).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 8, 64, " / ");
-      mvprintw(HORIZONTAL_SPLIT + 8, 67, std::to_string(sawmillManager->getOrderSum()).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar(sawmillManager->getOrderProgress(), 30).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, 62, (std::to_string((int)sawmillManager->getPreparedSum())).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, 64, " / ");
+      mvprintw(HORIZONTAL_SPLIT + 9, 67, std::to_string(sawmillManager->getOrderSum()).c_str());
       attroff(COLOR_PAIR(1));
     }
     else {
       attron(COLOR_PAIR(2));
-      mvprintw(HORIZONTAL_SPLIT + 8, 31, progressBar((int)transport->getProgress(), 30).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 8, 62, (std::to_string((int)transport->getProgress())).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 8, 64, " / 100");
+      mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar((int)transport->getProgress(), 30).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, 62, (std::to_string((int)transport->getProgress())).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, 64, " / 100");
       attroff(COLOR_PAIR(2));
     }
     mvprintw(HORIZONTAL_SPLIT + 11, VERTICAL_SPLIT + 2, ("MSG = "+sawmillManager->getMessage()).c_str());
@@ -200,13 +222,14 @@ void UI::update()
     // WEATHER
     //
     attron(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + SAWMILLS + 11, 5, "WEATHER:");
+    mvprintw(BORDER_BOTTOM - 2, 2, "WEATHER:");
     attroff(COLOR_PAIR(1));
-    mvprintw((int)trees.size() + SAWMILLS + 11, 14, (nature->getConditions()).c_str());
+    mvprintw(BORDER_BOTTOM - 2, 11, (nature->getConditions()).c_str());
+    mvprintw(BORDER_BOTTOM - 2, 19, "CHANGE IN:");
     attron(COLOR_PAIR(2));
-    mvprintw((int)trees.size() + SAWMILLS + 11, 31, progressBar((int)nature->getChangeProgress(), 30).c_str());
-    mvprintw((int)trees.size() + SAWMILLS + 11, 62, std::to_string((int)nature->getChangeProgress()).c_str());
-    mvprintw((int)trees.size() + SAWMILLS + 11, 64, " / 100");
+    mvprintw(BORDER_BOTTOM - 2, 30, progressBar((int)nature->getChangeProgress(), 30).c_str());
+    mvprintw(BORDER_BOTTOM - 2, 62, std::to_string((int)nature->getChangeProgress()).c_str());
+    mvprintw(BORDER_BOTTOM - 2, 64, " / 100");
     attroff(COLOR_PAIR(2));
 
     attron(A_NORMAL);
