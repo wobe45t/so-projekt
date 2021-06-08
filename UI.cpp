@@ -1,9 +1,9 @@
 #include "UI.h"
 #define SAWMILLS 3
-#define BORDER_RIGHT 110
-#define VERTICAL_SPLIT 72
+#define BORDER_RIGHT 118
+#define VERTICAL_SPLIT 80
 #define HORIZONTAL_SPLIT (int)trees.size() + 3
-#define BORDER_BOTTOM (int)trees.size() + 16
+#define BORDER_BOTTOM (int)trees.size() + 20
 
 UI::UI(Manager *manager) : manager(manager)
 {
@@ -61,15 +61,14 @@ void UI::update()
       }
       mvprintw(i + 3, 2, std::to_string(trees[i]->getId()).c_str());
       mvprintw(i + 3, 12, trees[i]->getState().c_str());
-      mvprintw(i + 3, 30, progressBar(progressBarValue, 30).c_str());
-      mvprintw(i + 3, 62, (std::to_string((int)progressBarValue)).c_str());
+      mvprintw(i + 3, 30, progressBar(progressBarValue, VERTICAL_SPLIT - 42).c_str());
       if((int)progressBarValue == 100) {
-        mvprintw(i + 3, 61, "100");
+        mvprintw(i + 3, VERTICAL_SPLIT - 11, "100");
       }
       else {
-        mvprintw(i + 3, 62, (std::to_string((int)progressBarValue)).c_str());
+        mvprintw(i + 3, VERTICAL_SPLIT - 10, (std::to_string((int)progressBarValue)).c_str());
       }
-      mvprintw(i + 3, 64, " / 100");
+      mvprintw(i + 3, VERTICAL_SPLIT - 8, " / 100");
       if (trees[i]->state == TreeState::CUTTING)
       {
         attroff(COLOR_PAIR(2));
@@ -108,14 +107,14 @@ void UI::update()
     mvprintw(2, VERTICAL_SPLIT + 2, "ID");
     mvprintw(2, VERTICAL_SPLIT + 7, "STATE");
     mvprintw(2,VERTICAL_SPLIT + 15, "TREE_ID"); // END OF CURRENT TREE PROGRESS BAR @@
-    mvprintw(2,VERTICAL_SPLIT + 23, "CUT_TREES"); // END OF CURRENT TREE PROGRESS BAR @@
+    mvprintw(2,VERTICAL_SPLIT + 25, "CUT_TREES"); // END OF CURRENT TREE PROGRESS BAR @@
     attroff(COLOR_PAIR(1));
     for (int i = 0; i < (int)lumberjacks.size(); i++)
     {
       mvprintw(i + 3, VERTICAL_SPLIT + 2, std::to_string(lumberjacks[i]->getId()).c_str());
       mvprintw(i + 3, VERTICAL_SPLIT + 7, lumberjacks[i]->getState().c_str());
       mvprintw(i + 3, VERTICAL_SPLIT + 17, std::to_string(lumberjacks[i]->getTreeId()).c_str());
-      mvprintw(i + 3, VERTICAL_SPLIT + 25, std::to_string(lumberjacks[i]->getCutTreeCounter()).c_str());
+      mvprintw(i + 3, VERTICAL_SPLIT + 27, std::to_string(lumberjacks[i]->getCutTreeCounter()).c_str());
     }
 
     //
@@ -124,15 +123,15 @@ void UI::update()
     mvprintw(HORIZONTAL_SPLIT + 1, VERTICAL_SPLIT + 2, "RESOURCES");
     attron(COLOR_PAIR(1));
     mvprintw(HORIZONTAL_SPLIT + 2, VERTICAL_SPLIT + 2, "NAME");
-    mvprintw(HORIZONTAL_SPLIT + 2, VERTICAL_SPLIT + 11, "QUANTITY");
+    mvprintw(HORIZONTAL_SPLIT + 2, VERTICAL_SPLIT + 10, "STORAGE");
     attroff(COLOR_PAIR(1));
     mvprintw(HORIZONTAL_SPLIT + 3, VERTICAL_SPLIT + 2, "WOOD");
-    mvprintw(HORIZONTAL_SPLIT + 3, VERTICAL_SPLIT + 14, std::to_string(resources->getWood()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 3, VERTICAL_SPLIT + 13, std::to_string(resources->getWood()).c_str());
     attron(COLOR_PAIR(1));
     mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 2, "BOARDS");
     if(sawmillManager->getOrderRdy()) {
-      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 11, "STORAGE");
-      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 20, "GOT");
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 10, "STORAGE");
+      mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 19, "PREP");
       mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 24, "/");
       mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 26, "ORDER");
       mvprintw(HORIZONTAL_SPLIT + 5, VERTICAL_SPLIT + 33, "NEED");
@@ -140,7 +139,7 @@ void UI::update()
 
     attroff(COLOR_PAIR(1));
     mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 2, "-LONG");
-    mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 14, std::to_string(resources->getLongBoards()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 13, std::to_string(resources->getLongBoards()).c_str());
     if(sawmillManager->getOrderRdy()) {
       mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedLongBoards()).c_str());
       mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 23, " / ");
@@ -148,7 +147,7 @@ void UI::update()
       mvprintw(HORIZONTAL_SPLIT + 8, VERTICAL_SPLIT + 33, std::string(sawmillManager->getLongBoardsNeeded() ? "YES": "NO").c_str());
     }
     mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 2, "-NORMAL");
-    mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 14, std::to_string(resources->getNormalBoards()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 13, std::to_string(resources->getNormalBoards()).c_str());
     if(sawmillManager->getOrderRdy()) {
       mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedNormalBoards()).c_str());
       mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 23, " / ");
@@ -156,7 +155,7 @@ void UI::update()
       mvprintw(HORIZONTAL_SPLIT + 7, VERTICAL_SPLIT + 33, std::string(sawmillManager->getNormalBoardsNeeded() ? "YES": "NO").c_str());
     }
     mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 2, "-SHORT");
-    mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 14, std::to_string(resources->getShortBoards()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 13, std::to_string(resources->getShortBoards()).c_str());
     if(sawmillManager->getOrderRdy()) {
       mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 22, std::to_string(sawmillManager->getPreparedShortBoards()).c_str());
       mvprintw(HORIZONTAL_SPLIT + 6, VERTICAL_SPLIT + 23, " / ");
@@ -172,52 +171,23 @@ void UI::update()
     mvprintw(HORIZONTAL_SPLIT+2, 2, "BOARD");
     mvprintw(HORIZONTAL_SPLIT+2, 10, "STATE");
     mvprintw(HORIZONTAL_SPLIT+2, 19, "SPEED");
-    mvprintw(HORIZONTAL_SPLIT+2, 39, "PROGRESS");
+    mvprintw(HORIZONTAL_SPLIT+2, 39, "BORDER PROGRESS");
     attroff(COLOR_PAIR(1));
     for(int i = 0; i < 3; i++) {
       mvprintw(HORIZONTAL_SPLIT+3+i, 2, (sawmillManager->getSawmillBoardTypeStr(i)).c_str());
       mvprintw(HORIZONTAL_SPLIT+3+i, 10, sawmillManager->getSawmillStateStr(i).c_str());
       mvprintw(HORIZONTAL_SPLIT+3+i, 19, sawmillManager->getSawmillSpeedStateStr(i).c_str());
       attron(COLOR_PAIR(2));
-      mvprintw(HORIZONTAL_SPLIT+3+i, 30, progressBar(sawmillManager->getSawmillProgress(i), 30).c_str());
-      // FIXME imporve
+      mvprintw(HORIZONTAL_SPLIT+3+i, 30, progressBar(sawmillManager->getSawmillProgress(i), VERTICAL_SPLIT - 42).c_str());
       if((int)sawmillManager->getSawmillProgress(i) == 100) {
-        mvprintw(HORIZONTAL_SPLIT+3+i, 61, "100");
+        mvprintw(HORIZONTAL_SPLIT+3+i, VERTICAL_SPLIT - 11, "100");
       }
       else {
-        mvprintw(HORIZONTAL_SPLIT+3+i, 62, (std::to_string((int)sawmillManager->getSawmillProgress(i))).c_str());
+        mvprintw(HORIZONTAL_SPLIT+3+i, VERTICAL_SPLIT - 10, (std::to_string((int)sawmillManager->getSawmillProgress(i))).c_str());
       }
-      mvprintw(HORIZONTAL_SPLIT+3+i, 64, " / 100");
+      mvprintw(HORIZONTAL_SPLIT+3+i, VERTICAL_SPLIT - 8, " / 100");
       attroff(COLOR_PAIR(2));
     }
-    //
-    // TRANSPORT
-    //
-    mvprintw(HORIZONTAL_SPLIT + 7, 6, "TRANSPORT");
-    attron(COLOR_PAIR(1));
-    mvprintw(HORIZONTAL_SPLIT + 8, 2, "COUNT");
-    mvprintw(HORIZONTAL_SPLIT + 8, 10, "STATE");
-    mvprintw(HORIZONTAL_SPLIT + 8, 39, "PROGRESS");
-    attroff(COLOR_PAIR(1));
-    mvprintw(HORIZONTAL_SPLIT + 9, 4, std::to_string(transport->getTransportCounter()).c_str());
-    mvprintw(HORIZONTAL_SPLIT + 9, 10, transport->getStateStr().c_str());
-    if(transport->getState() == TransportState::WAITING) {
-      attron(COLOR_PAIR(1));
-      mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar(sawmillManager->getOrderProgress(), 30).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 9, 62, (std::to_string((int)sawmillManager->getPreparedSum())).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 9, 64, " / ");
-      mvprintw(HORIZONTAL_SPLIT + 9, 67, std::to_string(sawmillManager->getOrderSum()).c_str());
-      attroff(COLOR_PAIR(1));
-    }
-    else {
-      attron(COLOR_PAIR(2));
-      mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar((int)transport->getProgress(), 30).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 9, 62, (std::to_string((int)transport->getProgress())).c_str());
-      mvprintw(HORIZONTAL_SPLIT + 9, 64, " / 100");
-      attroff(COLOR_PAIR(2));
-    }
-    mvprintw(HORIZONTAL_SPLIT + 11, VERTICAL_SPLIT + 2, ("MSG = "+sawmillManager->getMessage()).c_str());
-    mvprintw(HORIZONTAL_SPLIT + 12, VERTICAL_SPLIT + 2, ("FRAME="+std::to_string(counter)).c_str());
     //
     // WEATHER
     //
@@ -227,10 +197,61 @@ void UI::update()
     mvprintw(BORDER_BOTTOM - 2, 11, (nature->getConditions()).c_str());
     mvprintw(BORDER_BOTTOM - 2, 19, "CHANGE IN:");
     attron(COLOR_PAIR(2));
-    mvprintw(BORDER_BOTTOM - 2, 30, progressBar((int)nature->getChangeProgress(), 30).c_str());
-    mvprintw(BORDER_BOTTOM - 2, 62, std::to_string((int)nature->getChangeProgress()).c_str());
-    mvprintw(BORDER_BOTTOM - 2, 64, " / 100");
+    mvprintw(BORDER_BOTTOM - 2, 30, progressBar((int)nature->getChangeProgress(), VERTICAL_SPLIT - 42).c_str());
+    mvprintw(BORDER_BOTTOM - 2, VERTICAL_SPLIT - 10, std::to_string((int)nature->getChangeProgress()).c_str());
+    mvprintw(BORDER_BOTTOM - 2, VERTICAL_SPLIT - 8, " / 100");
     attroff(COLOR_PAIR(2));
+    //
+    // TRANSPORT
+    //
+    mvprintw(HORIZONTAL_SPLIT + 7, 6, "TRANSPORT");
+    attron(COLOR_PAIR(1));
+    mvprintw(HORIZONTAL_SPLIT + 8, 2, "COUNT");
+    mvprintw(HORIZONTAL_SPLIT + 8, 10, "STATE");
+    if(transport->getState() == TransportState::WAITING) {
+      mvprintw(HORIZONTAL_SPLIT + 8, 39, "ORDER PROGRESS");
+    }
+    attroff(COLOR_PAIR(1));
+    mvprintw(HORIZONTAL_SPLIT + 9, 4, std::to_string(transport->getTransportCounter()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 9, 10, transport->getStateStr().c_str());
+    if(transport->getState() == TransportState::WAITING) {
+      attron(COLOR_PAIR(2));
+      mvprintw(HORIZONTAL_SPLIT + 10, 5 + (int)(transport->getProgress()*0.6), ".-------.___");
+      mvprintw(HORIZONTAL_SPLIT + 11, 5 + (int)(transport->getProgress()*0.6), "| ||||| |[_o\\");
+      mvprintw(HORIZONTAL_SPLIT + 12, 5 + (int)(transport->getProgress()*0.6), "| ^^^^^ |- ` )");
+      mvprintw(HORIZONTAL_SPLIT + 13, 5 + (int)(transport->getProgress()*0.6), "'-()------()-");
+      attroff(COLOR_PAIR(2));
+      attron(COLOR_PAIR(1));
+      mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar(sawmillManager->getOrderProgress(), VERTICAL_SPLIT - 42).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT - 10, (std::to_string((int)sawmillManager->getPreparedSum())).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT - 8, " / ");
+      mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT - 5, std::to_string(sawmillManager->getOrderSum()).c_str());
+      attroff(COLOR_PAIR(1));
+    }
+    else {
+      attron(COLOR_PAIR(2));
+      // mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar((int)transport->getProgress(), 30).c_str());
+      if(transport->getState() == TransportState::TO_SHOP) {
+        mvprintw(HORIZONTAL_SPLIT + 10, 5 + (int)(transport->getProgress()*0.6), ".-------.___");
+        mvprintw(HORIZONTAL_SPLIT + 11, 5 + (int)(transport->getProgress()*0.6), "| ||||| |[_o\\");
+        mvprintw(HORIZONTAL_SPLIT + 12, 5 + (int)(transport->getProgress()*0.6), "| ^^^^^ |- ` )");
+        mvprintw(HORIZONTAL_SPLIT + 13, 5 + (int)(transport->getProgress()*0.6), "'-()------()-");
+      }
+      else {
+        mvprintw(HORIZONTAL_SPLIT + 10, 65 - (int)(transport->getProgress()*0.6), "  ___.-------.");
+        mvprintw(HORIZONTAL_SPLIT + 11, 65 - (int)(transport->getProgress()*0.6), " /o_]| ||||| |");
+        mvprintw(HORIZONTAL_SPLIT + 12, 65 - (int)(transport->getProgress()*0.6),"( ' -| ^^^^^ |");
+        mvprintw(HORIZONTAL_SPLIT + 13, 65 - (int)(transport->getProgress()*0.6)," -()------()-'");
+      }
+      mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT - 10, (std::to_string((int)transport->getProgress())).c_str());
+      mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT - 8, " / 100");
+      attroff(COLOR_PAIR(2));
+    }
+    mvprintw(HORIZONTAL_SPLIT + 11, VERTICAL_SPLIT + 2, ("MSG = "+sawmillManager->getMessage()).c_str());
+    mvprintw(HORIZONTAL_SPLIT + 12, VERTICAL_SPLIT + 2, ("FRAME="+std::to_string(counter)).c_str());
+    //
+    // WEATHER
+    //
 
     attron(A_NORMAL);
     refresh();
