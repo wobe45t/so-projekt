@@ -6,7 +6,6 @@
 SawmillManager::SawmillManager(Resources *resources): td(&SawmillManager::cycle, this)
 {
   this->resources = resources;
-  // create sawmills locally
   for(int i=0; i<SAWMILLS; i++) {
     sawmills.push_back(new Sawmill(resources, (BoardType)i));
   }
@@ -43,7 +42,6 @@ void SawmillManager::cycle()
         longBoardsNeeded = true;
         sawmills[2]->setSpeedState(SawmillSpeedState::ORDER);
       }
-      // CHOOSE SAWMILL TO SET PRIORITY
       choosePrioritySawmill();
 
       receivedBoard = resources->requestAnyBoard(shortBoardsNeeded, normalBoardsNeeded, longBoardsNeeded);
@@ -179,10 +177,6 @@ std::string SawmillManager::getSawmillSpeedStateStr(int index) {
 
 std::string SawmillManager::getSawmillStateStr(int index) {
   return sawmills[index]->getStateStr();
-}
-
-std::string SawmillManager::getMessage() {
-  return message;
 }
 
 int SawmillManager::getPreparedLongBoards()

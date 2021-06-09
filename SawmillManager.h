@@ -39,12 +39,9 @@ public:
   bool getOrderRdy();
   void getPreparedOrder(int shortBoards, int normalBoards, int longBoards);
   void choosePrioritySawmill();
-  std::string getMessage();
 private:
-  std::atomic<bool> fresh = {false};
   std::thread td;
   std::mutex mtx;
-  std::mutex mtx2;
   std::atomic<bool> orderRdy {false};
   std::atomic<int> preparedLongBoards {0};
   std::atomic<int> preparedNormalBoards {0};
@@ -55,10 +52,9 @@ private:
   std::atomic<bool> shortBoardsNeeded {false};
   std::atomic<bool> normalBoardsNeeded {false};
   std::atomic<bool> longBoardsNeeded {false};
-  std::string message;
   std::condition_variable cv;
-  bool running = true;
-  bool done = false;
+  std::atomic<bool> running {true};
+  std::atomic<bool> done {false};
   Resources * resources;
   std::vector<Sawmill*> sawmills;
 };

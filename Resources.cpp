@@ -1,5 +1,4 @@
 #include "Resources.h"
-#include <stdexcept>
 
 Resources::Resources() {
 
@@ -75,29 +74,26 @@ BoardType Resources::requestAnyBoard(bool shortBoardsNeeded, bool normalBoardsNe
 }
 
 int Resources::requestAllShortBoards() {
+  std::lock_guard<std::mutex> lock(mtx);
   int boards;
-  mtx.lock(); // FIXME change to lock_guard
   boards = shortBoard;
   shortBoard = 0;
-  mtx.unlock();
   return boards;
 }
 
 int Resources::requestAllNormalBoards() {
+  std::lock_guard<std::mutex> lock(mtx);
   int boards;
-  mtx.lock();
   boards = normalBoard;
   normalBoard = 0;
-  mtx.unlock();
   return boards;
 }
 
 int Resources::requestAllLongBoards() {
+  std::lock_guard<std::mutex> lock(mtx);
   int boards;
-  mtx.lock();
   boards = longBoard;
   longBoard = 0;
-  mtx.unlock();
   return boards;
 }
 
@@ -121,7 +117,6 @@ void Resources::addBoard(int boards, BoardType boardType) {
 }
 
 int Resources::requestBoard(int boards, BoardType boardType) {
-  // FIXME add lock_guard ...
   boardSum -= boards;
   switch(boardType) {
     case BoardType::LONG:
@@ -203,7 +198,6 @@ int Resources::requestLongBoard(int requestedBoards) {
   return result;
 }
 
-
 int Resources::getWood() {
   return wood;
 }
@@ -218,6 +212,3 @@ int Resources::getNormalBoards() {
   return normalBoard;
 }
 
-std::string Resources::getMessage() {
-  return this->message;
-}

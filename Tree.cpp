@@ -8,17 +8,17 @@ Tree::Tree(int id, Nature * nature, Resources * resources) : id(id), nature(natu
 
 void Tree::addLumberjack() {
   cuttingLumberjacks++;
-  if(cuttingLumberjacks.load()>1) {
-    float value = 1/float(cuttingLumberjacks.load());
-    cutSize.store(cutSize.load() - value + 1);
+  if(cuttingLumberjacks>1) {
+    float value = 1/float(cuttingLumberjacks);
+    cutSize = cutSize - value + 1;
   }
 }
 
 void Tree::cycle() {
   while(running) {
     if(state == TreeState::GROWING) {
-      float newValue = growth.load() + 1.0f * nature->getGrowthCoef();
-      growth.store(newValue);
+      float newValue = growth + 1.0f * nature->getGrowthCoef();
+      growth = newValue;
       if(newValue >= 100.0f) {
         state = TreeState::LIVING;
       } 
@@ -37,16 +37,12 @@ bool Tree::getDone() {
 void Tree::join() {
   this->td.join();
 }
-void Tree::finish() {
-  this->running = false;
-  this->td.join();
-}
 
 bool Tree::cut() {
   if(state == TreeState::GROWING) return false;
-  cutProgress.store(cutProgress.load() + cutSize.load());
+  cutProgress.store(cutProgress + cutSize);
   state = TreeState::CUTTING;
-  if(cutProgress.load()>=100 && running == true) {
+  if(cutProgress>=100 && running == true) {
     cuttingLumberjacks = 0;
     cutProgress = 0;
     growth = 0;
@@ -63,16 +59,16 @@ int Tree::getId() {
   return id;
 }
 float Tree::getGrowth() {
-  return growth.load();
+  return growth;
 }
 float Tree::getCutProgress() {
-  return cutProgress.load();
+  return cutProgress;
 }
 float Tree::getCutSize() {
-  return cutSize.load();
+  return cutSize;
 }
 int Tree::getCuttingLumberjacks() {
-  return cuttingLumberjacks.load();
+  return cuttingLumberjacks;
 }
 
 void Tree::setGrowth(float growth) {
