@@ -13,11 +13,17 @@ public:
   std::string getConditions();
   float getGrowthCoef();
   int getChangeProgress();
+  void setRunning(bool running);
+  bool getRunning();
+  bool getDone();
+  void join();
+  void finish();
 private:
   int grownTrees = 0;
   std::atomic<int> changeProgress {0};
   std::thread td;
   std::atomic<NatureCondition> condition;
   bool running = true;
+  bool done = false;
   
 };

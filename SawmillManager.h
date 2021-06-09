@@ -12,6 +12,10 @@ public:
   SawmillManager(Resources* resources);
   void cycle();
   void setRunning(bool running);
+  bool getRunning();
+  bool getDone();
+  void finish();
+  void join();
   bool getBoards();
   int getPreparedLongBoards();
   int getPreparedShortBoards();
@@ -23,6 +27,8 @@ public:
   bool getShortBoardsNeeded();
   bool getNormalBoardsNeeded();
 
+  bool getSawmillDone(int index);
+  bool getSawmillRunning(int index);
   int getSawmillProgress(int index);
   std::string getSawmillSpeedStateStr(int index);
   std::string getSawmillStateStr(int index);
@@ -52,6 +58,7 @@ private:
   std::string message;
   std::condition_variable cv;
   bool running = true;
+  bool done = false;
   Resources * resources;
   std::vector<Sawmill*> sawmills;
 };

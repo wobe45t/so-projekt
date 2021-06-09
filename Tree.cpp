@@ -24,16 +24,29 @@ void Tree::cycle() {
       } 
       usleep(100000 + rand() % 100000);
     }
-    //NOTE add DEAD state and sleep after cut
-    // usleep(500000);
   }
+  done = true;
+}
+
+void Tree::setRunning(bool running) {
+  this->running = running;
+}
+bool Tree::getDone() {
+  return done;
+}
+void Tree::join() {
+  this->td.join();
+}
+void Tree::finish() {
+  this->running = false;
+  this->td.join();
 }
 
 bool Tree::cut() {
   if(state == TreeState::GROWING) return false;
   cutProgress.store(cutProgress.load() + cutSize.load());
   state = TreeState::CUTTING;
-  if(cutProgress.load()>=100) {
+  if(cutProgress.load()>=100 && running == true) {
     cuttingLumberjacks = 0;
     cutProgress = 0;
     growth = 0;

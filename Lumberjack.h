@@ -13,7 +13,10 @@ public:
   static const int NumberOfLumberjacks = 10;
   Lumberjack(int id, vector<Tree *> trees);
   bool getRunning();
+  bool getDone();
   void setRunning(bool running);
+  void join();
+  void finish();
   int getId();
   int getTreeId();
   int getCutTreeCounter();
@@ -24,7 +27,8 @@ private:
   int id;
   int treeId;
   int cutTreeCounter = {0};
-  bool running = true; 
+  bool running = true;
+  bool done = false;
   std::atomic<LumberjackState> state {LumberjackState::WAITING};
   vector<Tree*> trees;
 

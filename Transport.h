@@ -25,6 +25,12 @@ public:
   void generateOrder();
   float getProgress();
   BoardType getTopBoardPriority();
+  void setRunning(bool running);
+  bool getRunning();
+  bool getDone();
+  void join();
+  void finish();
+
 private:
   TransportState transportState {TransportState::FROM_SHOP};
   Resources * resources;
@@ -33,7 +39,7 @@ private:
   std::atomic<int> transportCounter {0};
   // NOTE shouldnt running be atomic ? it is accessed from the main
   bool running = true;
-
+  bool done = false;
   std::atomic<int> orderedShortBoards {0};
   std::atomic<int> orderedNormalBoards {0};
   std::atomic<int> orderedLongBoards {0};

@@ -21,11 +21,13 @@ UI::~UI()
 }
 void UI::update()
 {
-  while (manager->getRunning())
+  while (running)
   {
     counter += 1;
     erase();
-    //! PRINTING TREES
+    //
+    // TREES
+    //
     mvprintw(0, 17, "TREES");
     attron(COLOR_PAIR(4));
     mvprintw(2, 2, "ID");
@@ -35,7 +37,6 @@ void UI::update()
     mvprintw(2, 40, "PROGRESS");
     attroff(COLOR_PAIR(4));
 
-    // mvprintw(2, BORDER_RIGHT + 2, std::to_string(resources->getWood()).c_str());
     for (int i = 0; i < (int)trees.size(); i++)
     {
       std::stringstream stream;
@@ -44,6 +45,7 @@ void UI::update()
       mvprintw(i + 3, 2, std::to_string(trees[i]->getId()).c_str());
       mvprintw(i + 3, 6, cutSize.c_str());
       mvprintw(i + 3, 22, std::to_string(trees[i]->getCuttingLumberjacks()).c_str());
+      // mvprintw(i + 3, 27, trees[i]->getDone() ? "TRUE" : "FALSE");
       float progressBarValue = 0;
       if (trees[i]->state == TreeState::CUTTING)
       {
@@ -106,8 +108,9 @@ void UI::update()
     attron(COLOR_PAIR(1));
     mvprintw(2, VERTICAL_SPLIT + 2, "ID");
     mvprintw(2, VERTICAL_SPLIT + 7, "STATE");
-    mvprintw(2,VERTICAL_SPLIT + 15, "TREE_ID"); // END OF CURRENT TREE PROGRESS BAR @@
-    mvprintw(2,VERTICAL_SPLIT + 25, "CUT_TREES"); // END OF CURRENT TREE PROGRESS BAR @@
+    mvprintw(2,VERTICAL_SPLIT + 15, "TREE_ID");
+    mvprintw(2,VERTICAL_SPLIT + 25, "CUT_TREES");
+    mvprintw(2,VERTICAL_SPLIT + 32, "DONE");
     attroff(COLOR_PAIR(1));
     for (int i = 0; i < (int)lumberjacks.size(); i++)
     {
@@ -115,7 +118,17 @@ void UI::update()
       mvprintw(i + 3, VERTICAL_SPLIT + 7, lumberjacks[i]->getState().c_str());
       mvprintw(i + 3, VERTICAL_SPLIT + 17, std::to_string(lumberjacks[i]->getTreeId()).c_str());
       mvprintw(i + 3, VERTICAL_SPLIT + 27, std::to_string(lumberjacks[i]->getCutTreeCounter()).c_str());
+      // mvprintw(i + 3, VERTICAL_SPLIT + 33, lumberjacks[i]->getDone() ? "TRUE" : "FALSE");
     }
+    //
+    // DONE
+    //
+    // mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT + 15, ("SAWMILLMANAGER " + std::string(sawmillManager->getDone() ? "TRUE" : "FALSE")).c_str());
+    // mvprintw(HORIZONTAL_SPLIT + 10, VERTICAL_SPLIT + 15, ("NATURE " + std::string(nature->getDone() ? "TRUE" : "FALSE")).c_str());
+    // mvprintw(HORIZONTAL_SPLIT + 11, VERTICAL_SPLIT + 15, ("TRANSPORT " + std::string(transport->getDone() ? "TRUE" : "FALSE")).c_str());
+    // for(int i=0;i<3; i++) {
+    //   mvprintw(HORIZONTAL_SPLIT + 12 + i, VERTICAL_SPLIT + 15, ("SAWMILL "+std::to_string(i) + " " + std::string(sawmillManager->getSawmillDone(i) ? "TRUE" : "FALSE")).c_str());
+    // }
 
     //
     // RESOURCES
@@ -230,7 +243,6 @@ void UI::update()
     }
     else {
       attron(COLOR_PAIR(2));
-      // mvprintw(HORIZONTAL_SPLIT + 9, 30, progressBar((int)transport->getProgress(), 30).c_str());
       if(transport->getState() == TransportState::TO_SHOP) {
         mvprintw(HORIZONTAL_SPLIT + 10, 5 + (int)(transport->getProgress()*0.6), ".-------.___");
         mvprintw(HORIZONTAL_SPLIT + 11, 5 + (int)(transport->getProgress()*0.6), "| ||||| |[_o\\");
@@ -247,11 +259,7 @@ void UI::update()
       mvprintw(HORIZONTAL_SPLIT + 9, VERTICAL_SPLIT - 8, " / 100");
       attroff(COLOR_PAIR(2));
     }
-    mvprintw(HORIZONTAL_SPLIT + 11, VERTICAL_SPLIT + 2, ("MSG = "+sawmillManager->getMessage()).c_str());
     mvprintw(HORIZONTAL_SPLIT + 12, VERTICAL_SPLIT + 2, ("FRAME="+std::to_string(counter)).c_str());
-    //
-    // WEATHER
-    //
 
     attron(A_NORMAL);
     refresh();
@@ -282,8 +290,10 @@ void UI::init()
       break;
     }
   }
-  //FIXME here function in manager should call every other item or it should be called individually from here
-  manager->setRunning(false);
+  mvprintw(BORDER_BOTTOM + 2, 2, "FINISHING THREADS ... ");
+  refresh();
+  this->running = false;
+  manager->exit();
   refreshThread.join();
   endwin();
 }

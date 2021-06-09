@@ -8,6 +8,19 @@ Transport::Transport(SawmillManager * sawmillManager, Resources * resources) : r
 
 }
 
+void Transport::setRunning(bool running) {
+  this->running = running;
+}
+bool Transport::getDone() {
+  return done;
+}
+void Transport::finish() {
+  this->running = false;
+  this->td.join();
+}
+void Transport::join() {
+  this->td.join();
+}
 void Transport::cycle() {
   int orderSum = 0;
   while(running) {
@@ -25,7 +38,7 @@ void Transport::cycle() {
       orderReady=false;
     }
     if(transportState == TransportState::TO_SHOP) {
-      while(progress <= 100.0f) {
+      while(progress <= 100.0f && running == true) {
         progress+=1;
         usleep(200000); //20sek
       }
@@ -33,7 +46,7 @@ void Transport::cycle() {
     }
     progress=0.0f;
     if(transportState == TransportState::FROM_SHOP){
-      while(progress <= 100.0f) {
+      while(progress <= 100.0f && running == true) {
         progress+=1;
         usleep(200000); //20sek
       }
@@ -41,6 +54,7 @@ void Transport::cycle() {
     }
     progress=0.0f;
   }
+  done = true;
 }
 
 int Transport::getShortBoards() {

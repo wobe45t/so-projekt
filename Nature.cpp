@@ -7,7 +7,7 @@ void Nature::cycle() {
   int random_value;
   while(running) {
     random_value = rand() % 50000;
-    while(changeProgress < 100) {
+    while(changeProgress < 100 && running == true) {
       usleep(100000 + random_value);
       changeProgress += 1;
     }
@@ -15,8 +15,25 @@ void Nature::cycle() {
     condition = (NatureCondition)randCondition;
     changeProgress = 0;
   }
+  done = true;
 }
 
+void Nature::setRunning(bool running) {
+  this->running = running;
+}
+bool Nature::getRunning() {
+  return running;
+}
+bool Nature::getDone() {
+  return done;
+}
+void Nature::join() {
+  this->td.join();
+}
+void Nature::finish() {
+  this->running = false;
+  this->td.join();
+}
 std::string Nature::getConditions() {
   switch(condition) {
     case NatureCondition::BAD:

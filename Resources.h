@@ -25,6 +25,8 @@ public:
   int requestAllNormalBoards();
   int requestAllLongBoards();
   std::string getMessage();
+  bool getRunning();
+  void setRunning(bool running);
 private:
   int wood = 0;
   int shortBoard = 0;
@@ -32,6 +34,7 @@ private:
   int normalBoard = 0;
   int boardSum = 0;
   int furniture = 0;
+  bool running = true;
   std::string message;
   std::mutex board_mutex;
   std::mutex mtx;

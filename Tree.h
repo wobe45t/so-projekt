@@ -12,6 +12,10 @@ class Tree {
 
 public:
   Tree(int id, Nature * nature, Resources * resources);
+  void setRunning(bool running);
+  bool getDone();
+  void finish();
+  void join();
   int getId();
   float getGrowth();
   float getCutProgress();
@@ -35,6 +39,7 @@ public:
 private:
   std::thread td;
   bool running = true;
+  bool done = false;
   Nature * nature;
   Resources * resources;
   int id;

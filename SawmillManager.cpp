@@ -17,13 +17,8 @@ void SawmillManager::cycle()
   BoardType receivedBoard;
   while (running)
   {
-    // NOTE this usleep fixed issue with race condition
-    usleep(100);
+    usleep(100); // naprawia zakleszczenie
     if(orderRdy) {
-      // NOTE THIS CHECK THROWS AN ERROR
-      // if(orderedLongBoards == preparedLongBoards && preparedLongBoards != 0 && orderedNormalBoards == preparedNormalBoards && preparedNormalBoards != 0 && orderedShortBoards == preparedShortBoards && preparedShortBoards != 0) {
-      //   throw std::logic_error("prepared " + std::to_string(preparedLongBoards) + " ordered " + std::to_string(orderedLongBoards));
-      // }
       if(preparedShortBoards >= orderedShortBoards) {
         shortBoardsNeeded = false;
         sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
@@ -41,7 +36,6 @@ void SawmillManager::cycle()
         sawmills[1]->setSpeedState(SawmillSpeedState::ORDER);
       }
       if(preparedLongBoards >= orderedLongBoards) {
-        message = "";
         longBoardsNeeded = false;
         sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
       }
@@ -62,9 +56,6 @@ void SawmillManager::cycle()
       else if(receivedBoard == BoardType::LONG) {
         preparedLongBoards ++;
       }
-      else {
-        throw std::logic_error("BoardType other");
-      }
       cv.notify_one();
     }
   }
@@ -73,9 +64,6 @@ void SawmillManager::choosePrioritySawmill() {
   int shortBoardDiff = orderedShortBoards - preparedShortBoards;
   int normalBoardDiff = orderedNormalBoards - preparedNormalBoards;
   int longBoardDiff = orderedLongBoards - preparedLongBoards;
-  // NOTE tutaj mozna by bylo dodac zmienne counter oraz previous prio board
-  // i sprawdzac czy counter przynajmniej odbyl sie 2 razy albo juz nie potrzeba konkretnych desek(wtedy counter moze byc 1)
-  // naprawilo by to problem ze skakaniem pomiedzy boardami co zmiane o 1 boarda w niektorych konfiguracjach orderu
   if(longBoardDiff >= normalBoardDiff) {
     if(normalBoardDiff >= shortBoardDiff && normalBoardsNeeded) {
       sawmills[2]->setSpeedState(SawmillSpeedState::PRIORITY);
@@ -105,8 +93,8 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
   preparedLongBoards = resources->requestLongBoard(longBoards);
   orderRdy = true;
   std::unique_lock<std::mutex> ul(mtx);
-  // NOTE possible issue with >= signs in the return statement
   cv.wait(ul, [&] {
+    if(running == false) return true;
     if(preparedShortBoards >= shortBoards && preparedNormalBoards >= normalBoards && preparedLongBoards >= longBoards) {
       orderRdy = false;
       sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
@@ -129,7 +117,28 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
 bool SawmillManager::getOrderRdy() {
   return orderRdy;
 }
-
+bool SawmillManager::getRunning() {
+  return running;
+}
+void SawmillManager::setRunning(bool running) {
+  for(int i=0; i<(int)sawmills.size(); i++) {
+    sawmills[i]->setRunning(running);
+  }
+  this->running = running;
+  // unlock cv.wait transport
+  mtx.unlock();
+  cv.notify_all();
+}
+void SawmillManager::finish() {
+  this->running = false;
+  this->td.join();
+}
+void SawmillManager::join() {
+  for(int i=0; i<(int)sawmills.size(); i++) {
+    sawmills[i]->join();
+  }
+  this->td.join();
+}
 int SawmillManager::getOrderProgress() {
   int preparedSum = preparedShortBoards + preparedNormalBoards + preparedLongBoards;
   int orderedSum = orderedShortBoards + orderedNormalBoards + orderedLongBoards;
@@ -139,6 +148,15 @@ int SawmillManager::getOrderProgress() {
   return (int)((preparedSum/(float)orderedSum)*100);
 }
 
+bool SawmillManager::getSawmillRunning(int index) {
+  return sawmills[index]->getRunning();
+}
+bool SawmillManager::getSawmillDone(int index) {
+  return sawmills[index]->getDone();
+}
+bool SawmillManager::getDone() {
+  return done;
+}
 int SawmillManager::getOrderSum() {
   return orderedShortBoards + orderedNormalBoards + orderedLongBoards;
 }

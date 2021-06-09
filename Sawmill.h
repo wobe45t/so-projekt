@@ -18,6 +18,9 @@ public:
   std::string getWorkRequestStr();
   BoardType getBoardType();
   void setRunning(bool running);
+  bool getRunning();
+  bool getDone();
+  void join();
   std::string getStateStr();
   float getProgress();
   SawmillState getState();
@@ -32,6 +35,7 @@ private:
   float progress = 0.0f;
   Resources * resources;
   bool running = true;
+  bool done = false;
   std::atomic<bool> priority {false};
   std::condition_variable cv;
   std::mutex mtx;

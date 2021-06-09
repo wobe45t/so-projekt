@@ -4,6 +4,15 @@
 Resources::Resources() {
 
 }
+void Resources::setRunning(bool running) {
+  this->running = running;
+  mtx.unlock();
+  cv.notify_all();
+}
+
+bool Resources::getRunning() {
+  return running;
+}
 
 void Resources::addWood(int wood) {
   std::lock_guard<std::mutex> lock(mtx);
@@ -13,43 +22,56 @@ void Resources::addWood(int wood) {
 
 void Resources::requestWood(int requestedWood) {
   std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {return (wood >= requestedWood) ? true : false;});
+  if(running == false) return;
+  cv.wait(ul, [&] {
+      if(running == false) {
+        return true;
+      }
+      if (wood >= requestedWood) {
+        return true;
+      }
+      return false;
+  });
   this->wood -= requestedWood;
 }
 
 BoardType Resources::requestAnyBoard(bool shortBoardsNeeded, bool normalBoardsNeeded, bool longBoardsNeeded) {
-  // moge tutaj zapisac stany poprzednich desek i sprawdzac wszystko w tym jednym cv.wait i przypisac po prostu typ deski ktory dostalo ?
-  int previousShortBoards = shortBoard;
-  int previousNormalBoards = normalBoard;
-  int previousLongBoards = longBoard;
-  BoardType returnBoard;
-  bool result = true;
-  std::unique_lock<std::mutex> ul(mtx);
-  cv.wait(ul, [&] {
-      if(previousShortBoards < shortBoard ) {
-        returnBoard = BoardType::SHORT;
-        if(shortBoardsNeeded) {
-          shortBoard--;
+  if(running) {
+    int previousShortBoards = shortBoard;
+    int previousNormalBoards = normalBoard;
+    int previousLongBoards = longBoard;
+    BoardType returnBoard;
+    std::unique_lock<std::mutex> ul(mtx);
+    cv.wait(ul, [&] {
+        if(running == false) {
           return true;
         }
-      }
-      if(previousNormalBoards < normalBoard){
-        returnBoard = BoardType::NORMAL;
-        if(normalBoardsNeeded) {
-          normalBoard --;
-          return true;
+        if(previousShortBoards < shortBoard ) {
+          returnBoard = BoardType::SHORT;
+          if(shortBoardsNeeded) {
+            shortBoard--;
+            return true;
+          }
         }
-      }
-      if(previousLongBoards < longBoard) {
-        returnBoard = BoardType::LONG;
-        if(longBoardsNeeded) {
-          longBoard--;
-          return true;
+        if(previousNormalBoards < normalBoard){
+          returnBoard = BoardType::NORMAL;
+          if(normalBoardsNeeded) {
+            normalBoard --;
+            return true;
+          }
         }
-      }
-      return false;
-  });
-  return returnBoard;
+        if(previousLongBoards < longBoard) {
+          returnBoard = BoardType::LONG;
+          if(longBoardsNeeded) {
+            longBoard--;
+            return true;
+          }
+        }
+        return false;
+    });
+    return returnBoard;
+  }
+  return BoardType::UNDEFINED;
 }
 
 int Resources::requestAllShortBoards() {
@@ -80,6 +102,7 @@ int Resources::requestAllLongBoards() {
 }
 
 void Resources::addBoard(int boards, BoardType boardType) {
+  if(running == false) return;
   std::lock_guard<std::mutex> lock(mtx);
   switch(boardType) {
     case BoardType::LONG:
@@ -93,7 +116,8 @@ void Resources::addBoard(int boards, BoardType boardType) {
     break;
   }
   boardSum += boards;
-  cv.notify_all();
+  if(running)
+    cv.notify_all();
 }
 
 int Resources::requestBoard(int boards, BoardType boardType) {
@@ -115,7 +139,7 @@ int Resources::requestBoard(int boards, BoardType boardType) {
 }
 
 void Resources::requestBoards(int requestedShortBoards, int requestedNormalBoards, int requestedLongBoards) {
-  std::unique_lock<std::mutex> ul(mtx); // FIXME change mutex to separate mutex (check other functions)
+  std::unique_lock<std::mutex> ul(mtx);
   cv.wait(ul, [&] {return (shortBoard >= requestedShortBoards && normalBoard >= requestedNormalBoards && longBoard >= requestedLongBoards) ? true : false;});
   shortBoard -= requestedShortBoards;
   normalBoard -= requestedNormalBoards;
@@ -193,7 +217,6 @@ int Resources::getShortBoards() {
 int Resources::getNormalBoards() {
   return normalBoard;
 }
-
 
 std::string Resources::getMessage() {
   return this->message;

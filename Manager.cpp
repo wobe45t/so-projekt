@@ -23,15 +23,30 @@ Manager::Manager()
     lumberjacks.push_back(new Lumberjack(i, trees));
   }
 }
-//FIXME change this function to exit or something and close all the child threads
-void Manager::setRunning(bool running)
-{
-  this->running = running;
-}
+void Manager::exit() {
+  resources->setRunning(false);
+  sawmillManager->setRunning(false);
+  for(int i=0; i<(int)trees.size(); i++) {
+    trees[i]->setRunning(false);
+  }
+  for(int i=0; i<(int)lumberjacks.size(); i++) {
+    lumberjacks[i]->setRunning(false);
+  }
 
-bool Manager::getRunning()
-{
-  return running;
+  nature->setRunning(false);
+  transport->setRunning(false);
+
+  // joining threads;
+
+  for(int i=0; i<(int)lumberjacks.size(); i++) {
+    lumberjacks[i]->join();
+  }
+  for(int i=0; i<(int)trees.size(); i++) {
+    trees[i]->join();
+  }
+  transport->join();
+  nature->join();
+  sawmillManager->join();
 }
 
 const std::vector<Tree *> Manager::getTrees()

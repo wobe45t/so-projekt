@@ -20,8 +20,7 @@ public:
   ~Manager();
   const std::vector<Tree *> getTrees();
 	const std::vector<Lumberjack *> getLumberjacks();
-  bool getRunning();
-  void setRunning(bool running);
+  void exit();
   Nature* getNature();
   Resources* getResources();
   SawmillManager * getSawmillManager();
@@ -33,5 +32,4 @@ private:
   Resources * resources;
   Transport * transport;
   SawmillManager * sawmillManager;
-  bool running = true;
 };

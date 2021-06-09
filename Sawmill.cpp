@@ -14,10 +14,9 @@ void Sawmill::cycle() {
     progress = 0.0f;
     random_delay = rand() % 10000;
     resources->requestWood(5);
-    while(progress<=100.0f) {
+    while(progress<=100.0f && running == true) {
     state = SawmillState::WORK;
       progress+=1;
-      // mtx.lock();
       if(speedState == SawmillSpeedState::NO_ORDER) {
         sleep_time = 200000;
       }
@@ -27,14 +26,19 @@ void Sawmill::cycle() {
       else {
         sleep_time = 50000;
       }
-      // mtx.unlock();
       usleep(sleep_time + random_delay);
     }
     //  FIXME no need for first parameter in this function
-    resources->addBoard(1, boardType);
-  }
-}
+    if(running) {
+      resources->addBoard(1, boardType);
+    }
 
+  }
+  done = true;
+}
+bool Sawmill::getDone() {
+  return done;
+}
 std::string Sawmill::getBoardTypeStr() {
   switch(boardType) {
     case BoardType::SHORT:
@@ -92,7 +96,12 @@ bool Sawmill::getPriority() {
 void Sawmill::setRunning(bool running){
   this->running = running;
 }
-
+bool Sawmill::getRunning() {
+  return running;
+}
+void Sawmill::join() {
+  this->td.join();
+}
 float Sawmill::getProgress() {
   return progress;
 }

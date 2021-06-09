@@ -44,7 +44,7 @@ void Lumberjack::cycle()
 
       int sleepTime = 100000 + rand() % 100000;
 
-      while (cutTree)
+      while (cutTree && running)
       {
         tree->mtx.lock();
         cutTree = tree->cut();
@@ -57,6 +57,7 @@ void Lumberjack::cycle()
     state = LumberjackState::RESTING;
     usleep(1000000);
   }
+  done = true;
 }
 
 void Lumberjack::setRunning(bool running)
@@ -64,6 +65,16 @@ void Lumberjack::setRunning(bool running)
   this->running = running;
 }
 
+bool Lumberjack::getDone() {
+  return done;
+}
+void Lumberjack::finish() {
+  this->running = false;
+  this->td.join();
+}
+void Lumberjack::join() {
+  this->td.join();
+}
 bool Lumberjack::getRunning() { return running; }
 
 int Lumberjack::getId()
