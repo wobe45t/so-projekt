@@ -1,7 +1,7 @@
 #include "Transport.h"
 #include <unistd.h>
 
-#define RAND_RANGE 10
+#define RAND_RANGE 7
 
 Transport::Transport(SawmillManager * sawmillManager, Resources * resources) : resources(resources), sawmillManager(sawmillManager), td(&Transport::cycle, this)
 {
@@ -40,7 +40,7 @@ void Transport::cycle() {
     if(transportState == TransportState::TO_SHOP) {
       while(progress <= 100.0f && running == true) {
         progress+=1;
-        usleep(200000); //20sek
+        usleep(100000); //10sek
       }
       transportState = TransportState::FROM_SHOP;
     }
@@ -48,7 +48,7 @@ void Transport::cycle() {
     if(transportState == TransportState::FROM_SHOP){
       while(progress <= 100.0f && running == true) {
         progress+=1;
-        usleep(200000); //20sek
+        usleep(100000); //10sek
       }
       transportState = TransportState::WAITING;
     }
