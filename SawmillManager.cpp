@@ -94,23 +94,23 @@ void SawmillManager::getPreparedOrder(int shortBoards, int normalBoards, int lon
   cv.wait(ul, [&] {
     if(running == false) return true;
     if(preparedShortBoards >= shortBoards && preparedNormalBoards >= normalBoards && preparedLongBoards >= longBoards) {
-      orderRdy = false;
-      sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
-      sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
-      sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
-      shortBoardsNeeded = false;
-      normalBoardsNeeded = false;
-      longBoardsNeeded = false;
-      preparedShortBoards = 0;
-      preparedNormalBoards = 0;
-      preparedLongBoards = 0;
-      orderedShortBoards = 0;
-      orderedNormalBoards = 0;
-      orderedLongBoards = 0;
       return true;
     }
     return false;
   });
+  orderRdy = false;
+  sawmills[0]->setSpeedState(SawmillSpeedState::NO_ORDER);
+  sawmills[1]->setSpeedState(SawmillSpeedState::NO_ORDER);
+  sawmills[2]->setSpeedState(SawmillSpeedState::NO_ORDER);
+  shortBoardsNeeded = false;
+  normalBoardsNeeded = false;
+  longBoardsNeeded = false;
+  preparedShortBoards = 0;
+  preparedNormalBoards = 0;
+  preparedLongBoards = 0;
+  orderedShortBoards = 0;
+  orderedNormalBoards = 0;
+  orderedLongBoards = 0;
 }
 bool SawmillManager::getOrderRdy() {
   return orderRdy;
