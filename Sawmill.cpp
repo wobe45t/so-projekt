@@ -28,7 +28,6 @@ void Sawmill::cycle() {
       }
       usleep(sleep_time + random_delay);
     }
-    //  FIXME no need for first parameter in this function
     if(running) {
       resources->addBoard(1, boardType);
     }
